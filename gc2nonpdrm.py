@@ -162,7 +162,7 @@ def gc2nonpdrm(vciFile):
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("usage: <vcifile or psvfile>")
-        quit()
+        sys.exit()
     gcFile = sys.argv[1]
     
     gc2nonpdrm(gcFile)

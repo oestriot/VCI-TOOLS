@@ -74,7 +74,7 @@ def vci2psv(vci, psv, key):
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("usage: <vcifile> [psvfile] [keyfile]")
-        quit()
+        sys.exit()
     vciFile = sys.argv[1]
     
     # get psv filename

@@ -61,7 +61,7 @@ def extractvci(vcifile):
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("usage: <vcifile>")
-        quit()
+        sys.exit()
         
     vcifile = sys.argv[1]
     extractvci(vcifile)
