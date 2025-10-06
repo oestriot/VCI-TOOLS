@@ -24,28 +24,28 @@ def vci2psv(vci, psv, key):
     v = open(vci, "rb")
     print("Reading VCI file ...")
     # read VCI header
-    header = struct.unpack("3sxIQ32s32s432x", v.read(SECTOR_SIZE))
+    header = struct.unpack("3sxHHQ32s32s432x", v.read(SECTOR_SIZE))
     
     if header[0] == b"VCI" and header[1] == 0x1:
-        totalSize = header[2]
+        totalSize = header[3]
         totalSectors = int(totalSize / SECTOR_SIZE)
         
         print("Deriving keys ...")
         
         # derive rif key from original key parts
-        rifkey = deriveRifKey(header[3], header[4])
+        rifkey = deriveRifKey(header[4], header[5])
         print("Rif Key: "+binascii.hexlify(rifkey).decode("UTF-8"))
             
         # derive rif signature from key parts
-        sig = deriveRifSignature(header[3])
+        sig = deriveRifSignature(header[4])
         print("Rif Signature: "+binascii.hexlify(sig).decode("UTF-8"))
         
         # write key parts to a file
         k = open(key, "wb")
         print("Writing key file ...")
 
-        k.write(header[3])
         k.write(header[4])
+        k.write(header[5])
         k.close()
          
         p = open(psv, "wb")
