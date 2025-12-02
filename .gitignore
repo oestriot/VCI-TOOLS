@@ -163,3 +163,7 @@ cython_debug/
 *.spec
 build/*
 dist/*
+
+VciTools/build/*
+VciTools/*.user
+VciTools/*.vs/*
