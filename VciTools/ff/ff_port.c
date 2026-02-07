@@ -20,7 +20,6 @@ DSTATUS disk_status(BYTE pdrv) {
 	return RES_OK;
 }
 DRESULT disk_read(BYTE pdrv, BYTE* buff, LBA_t sector, UINT count) {
-	printf("disk_read: %x %p %x %x\n", pdrv, buff, sector, count);
 	if (pdrv == 0) {
 		fseek(emulated_drive, emulated_offset + (sector * SECTOR_SIZE), SEEK_SET);
 		fread(buff, 1, count * SECTOR_SIZE, emulated_drive);
@@ -31,7 +30,6 @@ DRESULT disk_read(BYTE pdrv, BYTE* buff, LBA_t sector, UINT count) {
 	}
 }
 DRESULT disk_write(BYTE pdrv, const BYTE* buff, LBA_t sector, UINT count) {
-	printf("disk_write: %x %p %x %x\n", pdrv, buff, sector, count);
 	if (pdrv == 0) {
 		fseek(emulated_drive, emulated_offset + (sector * SECTOR_SIZE), SEEK_SET);
 		fwrite(buff, 1, count * SECTOR_SIZE, emulated_drive);

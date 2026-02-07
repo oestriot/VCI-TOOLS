@@ -28,14 +28,16 @@ void read_recursive(char* prev, const char* extract_dir) {
 	if (res == FR_OK) {
 		while(1) {
 			res = f_readdir(&dr, &fileinfo);
-			if (res != FR_OK && fileinfo.fname[0] == '\0') break;
+			if (res != FR_OK || fileinfo.fname[0] == '\0') break;
 
-			size_t prev_len = strlen(prev);
+			//size_t prev_len = strlen(prev);
+			if (strcmp(prev, "/") == 0) prev++;
 
-			snprintf(path, sizeof(path) - 1, "%.*s/%s", prev_len, fileinfo.fname);
-			snprintf(opath, sizeof(opath) - 1, "%s/%.*s/%s", extract_dir, prev, fileinfo.fname);
-
+			snprintf(path, sizeof(path) - 1, "%s/%s", prev, fileinfo.fname);
+			snprintf(opath, sizeof(opath) - 1, "%s%s/%s", extract_dir, prev, fileinfo.fname);
+			
 			if ((fileinfo.fattrib & AM_DIR) != 0) {
+				create_directories(opath, 0);
 				read_recursive(path, extract_dir);
 			}
 			if ((fileinfo.fattrib & AM_DIR) == 0) {
@@ -189,7 +191,7 @@ int main(int argc, char** argv) {
 			change_extension("-cart_hash.bin", gc_img, sizeof(gc_img), scratch);
 			write_file(scratch, psv->cart_hash, sizeof(psv->cart_hash));
 
-			// seek to mbr
+			// seek to MBR
 			fseek(img, psv->image_offset * SECTOR_SIZE, SEEK_SET);
 			
 		}
@@ -202,16 +204,21 @@ int main(int argc, char** argv) {
 		if (memcmp(mbr->magic, SCE_MBR_MAGIC, sizeof(mbr->magic)) == 0) {
 			for (size_t i = 0; i < (sizeof(mbr->partitions) / sizeof(ScePartition)); i++) {
 				if (mbr->partitions[i].code == ScePartitionCode_EMPTY) continue;
-				// get partition filename 
+				const char* partition_name = partition_code_to_name(mbr->partitions[i].code);
 
+				printf("Parsing ... %s\n", partition_name);
+
+				// get partition filename 
 				char extension[0x30] = { 0 };
-				snprintf(extension, sizeof(extension) - 1, ".%s-%s.img", partition_code_to_name(mbr->partitions[i].code), format_id_to_name(mbr->partitions[i].type));
+				snprintf(extension, sizeof(extension) - 1, ".%s-%s.img", partition_name, format_id_to_name(mbr->partitions[i].type));
 				change_extension(extension, gc_img, sizeof(gc_img), scratch);
 				
 				if (!dump_raw && (mbr->partitions[i].type == ScePartitionType_EXFAT || mbr->partitions[i].type == ScePartitionType_FAT16)) {
-					ff_init(img, mbr_start_pos + (mbr->partitions[i].offset * SECTOR_SIZE));
-					f_mount(&fs, "/", 0);
-					read_recursive("/", partition_code_to_name(mbr->partitions[i].code));
+					uint64_t offset = mbr_start_pos + (mbr->partitions[i].offset * SECTOR_SIZE);
+					ff_init(img, offset);
+					f_mount(&fs, "0:", 1);
+					read_recursive("/", partition_name);
+					f_unmount("0:");
 				}
 				else {
 					dump_partiton(img, &mbr->partitions[i], mbr_start_pos, scratch);
