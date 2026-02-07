@@ -4,13 +4,11 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "compat.h"
-
-#include "vci.h"
-#include "psv.h"
-#include "mbr.h"
-
-#include "path.h"
+#include "lib/compat.h"
+#include "lib/vci.h"
+#include "lib/psv.h"
+#include "lib/mbr.h"
+#include "lib/path.h"
 
 static uint8_t buffer[SECTOR_SIZE * 0x5000];
 

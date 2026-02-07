@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "extractgc", "extractgc.vcxp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gc2img", "gc2img.vcxproj", "{73EAC674-FC5D-41F1-A880-DEA34918EDD6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gc2nonpdrm", "gc2nonpdrm.vcxproj", "{33401B07-DEA5-4B53-9DDA-11774EACC792}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{73EAC674-FC5D-41F1-A880-DEA34918EDD6}.Release|x64.Build.0 = Release|x64
 		{73EAC674-FC5D-41F1-A880-DEA34918EDD6}.Release|x86.ActiveCfg = Release|Win32
 		{73EAC674-FC5D-41F1-A880-DEA34918EDD6}.Release|x86.Build.0 = Release|Win32
+		{33401B07-DEA5-4B53-9DDA-11774EACC792}.Debug|x64.ActiveCfg = Debug|x64
+		{33401B07-DEA5-4B53-9DDA-11774EACC792}.Debug|x64.Build.0 = Debug|x64
+		{33401B07-DEA5-4B53-9DDA-11774EACC792}.Debug|x86.ActiveCfg = Debug|Win32
+		{33401B07-DEA5-4B53-9DDA-11774EACC792}.Debug|x86.Build.0 = Debug|Win32
+		{33401B07-DEA5-4B53-9DDA-11774EACC792}.Release|x64.ActiveCfg = Release|x64
+		{33401B07-DEA5-4B53-9DDA-11774EACC792}.Release|x64.Build.0 = Release|x64
+		{33401B07-DEA5-4B53-9DDA-11774EACC792}.Release|x86.ActiveCfg = Release|Win32
+		{33401B07-DEA5-4B53-9DDA-11774EACC792}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -19,22 +19,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="compat.c" />
-    <ClCompile Include="gcauthmgr.c" />
-    <ClCompile Include="path.c" />
-    <ClCompile Include="sha1.c" />
+    <ClCompile Include="lib\compat.c" />
+    <ClCompile Include="lib\gcauthmgr.c" />
+    <ClCompile Include="lib\path.c" />
+    <ClCompile Include="lib\sha1.c" />
     <ClCompile Include="vci2psv.c" />
-    <ClCompile Include="sha256.c" />
+    <ClCompile Include="lib\sha256.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="compat.h" />
-    <ClInclude Include="gcauthmgr.h" />
-    <ClInclude Include="mbr.h" />
-    <ClInclude Include="path.h" />
-    <ClInclude Include="psv.h" />
-    <ClInclude Include="sha1.h" />
-    <ClInclude Include="sha256.h" />
-    <ClInclude Include="vci.h" />
+    <ClInclude Include="lib\compat.h" />
+    <ClInclude Include="lib\gcauthmgr.h" />
+    <ClInclude Include="lib\mbr.h" />
+    <ClInclude Include="lib\path.h" />
+    <ClInclude Include="lib\psv.h" />
+    <ClInclude Include="lib\sha1.h" />
+    <ClInclude Include="lib\sha256.h" />
+    <ClInclude Include="lib\vci.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

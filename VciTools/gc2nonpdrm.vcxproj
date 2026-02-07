@@ -19,30 +19,31 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ff\ff.c" />
+    <ClCompile Include="ff\ffsystem.c" />
+    <ClCompile Include="ff\ffunicode.c" />
+    <ClCompile Include="ff\ff_port.c" />
+    <ClCompile Include="gc2nonpdrm.c" />
     <ClCompile Include="lib\compat.c" />
-    <ClCompile Include="lib\gcauthmgr.c" />
     <ClCompile Include="lib\path.c" />
-    <ClCompile Include="gc2vci.c" />
-    <ClCompile Include="lib\sha1.c" />
-    <ClCompile Include="lib\sha256.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ff\ff.h" />
+    <ClInclude Include="ff\ffconf.h" />
+    <ClInclude Include="ff\ff_port.h" />
     <ClInclude Include="lib\compat.h" />
-    <ClInclude Include="lib\gcauthmgr.h" />
     <ClInclude Include="lib\mbr.h" />
     <ClInclude Include="lib\path.h" />
     <ClInclude Include="lib\psv.h" />
-    <ClInclude Include="lib\sha1.h" />
-    <ClInclude Include="lib\sha256.h" />
     <ClInclude Include="lib\vci.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{565770E2-65F7-4AFE-AFE6-9258739E1148}</ProjectGuid>
+    <ProjectGuid>{33401B07-DEA5-4B53-9DDA-11774EACC792}</ProjectGuid>
     <RootNamespace>VciTools</RootNamespace>
     <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
-    <ProjectName>gc2vci</ProjectName>
+    <ProjectName>gc2nonpdrm</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

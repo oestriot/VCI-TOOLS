@@ -4,16 +4,14 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "compat.h"
-
-#include "vci.h"
-#include "psv.h"
-#include "mbr.h"
-
-#include "sha1.h"
-#include "sha256.h"
-#include "path.h"
-#include "gcauthmgr.h"
+#include "lib/compat.h"
+#include "lib/vci.h"
+#include "lib/psv.h"
+#include "lib/mbr.h"
+#include "lib/sha1.h"
+#include "lib/sha256.h"
+#include "lib/path.h"
+#include "lib/gcauthmgr.h"
 
 static uint8_t buffer[SECTOR_SIZE * 0x5000];
 

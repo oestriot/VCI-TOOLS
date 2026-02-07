@@ -3,17 +3,69 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "compat.h"
-#include "path.h"
+#include "lib/compat.h"
+#include "lib/path.h"
+#include "lib/vci.h"
+#include "lib/psv.h"
+#include "lib/mbr.h"
+#include "lib/gcauthmgr.h"
 
-#include "vci.h"
-#include "psv.h"
-#include "mbr.h"
-
-#include "gcauthmgr.h"
+#include "ff/ff_port.h"
+#include "ff/ff.h"
 
 static uint8_t buffer[SECTOR_SIZE * 0x5000];
+static FATFS fs;
 
+void read_recursive(char* prev, const char* extract_dir) {
+	char path[MAX_PATH] = { 0 };
+	char opath[MAX_PATH] = { 0 };
+
+	FIL fl = { 0 };
+	DIR dr = { 0 };
+	FILINFO fileinfo = { 0 };
+
+	FRESULT res = f_opendir(&dr, prev);
+	if (res == FR_OK) {
+		while(1) {
+			res = f_readdir(&dr, &fileinfo);
+			if (res != FR_OK && fileinfo.fname[0] == '\0') break;
+
+			size_t prev_len = strlen(prev);
+
+			snprintf(path, sizeof(path) - 1, "%.*s/%s", prev_len, fileinfo.fname);
+			snprintf(opath, sizeof(opath) - 1, "%s/%.*s/%s", extract_dir, prev, fileinfo.fname);
+
+			if ((fileinfo.fattrib & AM_DIR) != 0) {
+				read_recursive(path, extract_dir);
+			}
+			if ((fileinfo.fattrib & AM_DIR) == 0) {
+				create_directories(opath, 0);
+				f_open(&fl, path, FA_READ);
+				FILE* out_fd = fopen(opath, "wb");
+
+				if (out_fd != NULL) {
+					uint32_t rd = 0;
+					uint64_t total = 0;
+
+					do {
+						f_read(&fl, buffer, sizeof(buffer), &rd);
+						total += fwrite(buffer, 1, rd, out_fd);
+						printf("%s: %llu / %llu (%.0f%%)\r", opath, total, fileinfo.fsize, (((double)total / (double)fileinfo.fsize) * 100.0));
+					} while (total < fileinfo.fsize);
+					printf("\n");
+
+					fclose(out_fd);
+					f_close(&fl);
+				}
+
+			}
+		}
+
+		f_closedir(&dr);
+	}
+
+
+}
 
 const char* format_id_to_name(int format_id) {
 	switch (format_id) {
@@ -87,6 +139,7 @@ void dump_partiton(FILE* img, ScePartition* part, uint64_t mbr_start_pos, const 
 
 int main(int argc, char** argv) {
 	int ret = 0;
+	uint8_t dump_raw = 0;
 	size_t rd, total = 0;
 
 	char scratch[0x500] = { 0 };
@@ -96,8 +149,15 @@ int main(int argc, char** argv) {
 		strncpy(gc_img, argv[1], sizeof(gc_img) - 1);
 	}
 	else {
-		fprintf(stderr, "Usage: extractgc <gc_image>\n");
+		fprintf(stderr, "Usage: extractgc <gc_image> [dump_raw]\n");
+		fprintf(stderr, "gc_image\tpath to a .img, .psv, or .vci file.\n");
+		fprintf(stderr, "dump_raw\t'true' or 'false'\tdetermines wether to extract disk images, or extract files\n");
+
 		return -1;
+	}
+	
+	if (argc >= 3) {
+		dump_raw = (strcmp(argv[2], "true") == 0);
 	}
 
 	if (file_exists(gc_img)) {
@@ -148,16 +208,30 @@ int main(int argc, char** argv) {
 				snprintf(extension, sizeof(extension) - 1, ".%s-%s.img", partition_code_to_name(mbr->partitions[i].code), format_id_to_name(mbr->partitions[i].type));
 				change_extension(extension, gc_img, sizeof(gc_img), scratch);
 				
-				// dump the partition
-				dump_partiton(img, &mbr->partitions[i], mbr_start_pos, scratch);
+				if (!dump_raw && (mbr->partitions[i].type == ScePartitionType_EXFAT || mbr->partitions[i].type == ScePartitionType_FAT16)) {
+					ff_init(img, mbr_start_pos + (mbr->partitions[i].offset * SECTOR_SIZE));
+					f_mount(&fs, "/", 0);
+					read_recursive("/", partition_code_to_name(mbr->partitions[i].code));
+				}
+				else {
+					dump_partiton(img, &mbr->partitions[i], mbr_start_pos, scratch);
+				}
+
 			}
 		}
 		else {
 			fprintf(stderr, "image file has an invalid SceMbr !!!\n");
+			ret = -1;
 		}
 		
 
 		fclose(img);
+		return ret;
 	}
+	else {
+		fprintf(stderr, "%s: file not found.\n", gc_img);
+		ret = -1;
+	}
+	return ret;
 
 }
