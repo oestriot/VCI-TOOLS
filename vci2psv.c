@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
 			} while (rd == sizeof(buffer));
 
 			// update the hash in the psv header
-			Sha256Finalise(&sha256, psv_header.all_sectors_sha256);
+			Sha256Finalise(&sha256, (SHA256_HASH*)psv_header.all_sectors_sha256);
 
 			// write modified header to disk
 			fseek(psv, 0, SEEK_SET);

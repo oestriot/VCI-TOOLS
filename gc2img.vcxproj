@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="lib\aes.c" />
     <ClCompile Include="lib\compat.c" />
     <ClCompile Include="lib\exfat.c" />
     <ClCompile Include="lib\ff\diskio.c" />
@@ -26,20 +27,25 @@
     <ClCompile Include="lib\ff\ffsystem.c" />
     <ClCompile Include="lib\ff\ffunicode.c" />
     <ClCompile Include="lib\gcauthmgr.c" />
+    <ClCompile Include="lib\hmac_sha256.c" />
     <ClCompile Include="lib\mbr.c" />
+    <ClCompile Include="lib\npdrm.c" />
     <ClCompile Include="lib\path.c" />
+    <ClCompile Include="gc2img.c" />
     <ClCompile Include="lib\sha1.c" />
-    <ClCompile Include="vci2psv.c" />
     <ClCompile Include="lib\sha256.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="lib\aes.h" />
     <ClInclude Include="lib\compat.h" />
     <ClInclude Include="lib\exfat.h" />
     <ClInclude Include="lib\ff\diskio.h" />
     <ClInclude Include="lib\ff\ff.h" />
     <ClInclude Include="lib\ff\ffconf.h" />
     <ClInclude Include="lib\gcauthmgr.h" />
+    <ClInclude Include="lib\hmac_sha256.h" />
     <ClInclude Include="lib\mbr.h" />
+    <ClInclude Include="lib\npdrm.h" />
     <ClInclude Include="lib\path.h" />
     <ClInclude Include="lib\psv.h" />
     <ClInclude Include="lib\sha1.h" />
@@ -49,10 +55,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{a63dfaf7-8242-4858-bcf3-97fdbb347d35}</ProjectGuid>
+    <ProjectGuid>{73EAC674-FC5D-41F1-A880-DEA34918EDD6}</ProjectGuid>
     <RootNamespace>VciTools</RootNamespace>
     <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
-    <ProjectName>vci2psv</ProjectName>
+    <ProjectName>gc2img</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
