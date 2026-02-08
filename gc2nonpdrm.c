@@ -78,17 +78,16 @@ int read_license(SceNpDrmLicense* license) {
 
 	if (f_opendir(&dr, license_path) == FR_OK) {
 		if (f_readdir(&dr, &fileinfo) == FR_OK) {
-			f_closedir(&dr); 
+			f_closedir(&dr);
 
-			if (fileinfo.fname[0] != '\0') return 0;
+			if (fileinfo.fname[0] == '\0') return 0;
 			snprintf(scratch, sizeof(scratch) - 1, "%s/%s", license_path, fileinfo.fname);
-			
 
 			if (f_open(&fl, scratch, FA_READ) == FR_OK) {
 				f_read(&fl, license, sizeof(SceNpDrmLicense), &rd);
 				f_close(&fl);
 				
-				if (rd != sizeof(SceNpDrmLicense)) return 0;
+				if (rd < sizeof(SceNpDrmLicense)) return 0;
 				return 1;
 			}
 
@@ -97,9 +96,6 @@ int read_license(SceNpDrmLicense* license) {
 
 	return 0;
 }
-
-
-
 
 int main(int argc, char** argv) {
 	int res = -1;
@@ -120,8 +116,6 @@ int main(int argc, char** argv) {
 	else {
 		change_extension("", gc_img, sizeof(gc_img), out_folder);
 	}
-
-	create_directories(out_folder, 1);
 
 	if (file_exists(gc_img)) {
 		FILE* img = fopen(gc_img, "rb");

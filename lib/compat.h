@@ -11,12 +11,15 @@
 
 #define ftell _ftelli64
 #define fseek _fseeki64
-#define main utf8_main
 #define fopen utf8_fopen
 #define mkdir(dir, perm) utf8_mkdir(dir)
 FILE* utf8_fopen(const char* filename, const char* mode);
 int utf8_mkdir(const char* dirname);
+
+#ifdef _MSC_VER
+#define main utf8_main
 extern int utf8_main(int argc, char** argv);
+#endif
 
 #endif
 

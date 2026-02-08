@@ -28,6 +28,7 @@ FILE* utf8_fopen(const char* filename, const char* mode) {
 	return _wfopen(wfname, wmode);
 }
 
+#ifdef _MSC_VER
 int wmain(int argc, wchar_t** argv) {
 	setlocale(LC_ALL, ".UTF8");
 	SetConsoleOutputCP(CP_UTF8);
@@ -47,4 +48,6 @@ int wmain(int argc, wchar_t** argv) {
 	}
 	return utf8_main(argc, utf8_argv);
 }
+#endif
+
 #endif

@@ -19,7 +19,6 @@ void ff_init(FILE* fd, uint64_t offset, uint64_t size) {
 }
 
 void seek_64bit(FILE* fd, uint64_t offset) {
-
 #ifdef _WIN32
 	_fseeki64(emulated_drive, offset, SEEK_SET);
 #elif __linux__
