@@ -19,7 +19,6 @@
 #include <assert.h>
 static char scratch[0x1028] = { 0 };
 
-
 int read_title_id(char* title_id) {
 	FIL fl = { 0 };
 	DIR dr = { 0 };
@@ -67,24 +66,29 @@ int write_license(SceNpDrmLicense* old_license, uint8_t* klicensee, const char* 
 
 int read_license(SceNpDrmLicense* license) {
 	char title_id[0x10] = { 0 };
+	char license_path[0x500] = { 0 };
+
 	FIL fl = { 0 };
 	DIR dr = { 0 };
 	FILINFO fileinfo = { 0 };
+	uint32_t rd = 0;
 
 	read_title_id(title_id);
+	snprintf(license_path, sizeof(license_path) - 1, "/license/app/%s", title_id);
 
-	snprintf(scratch, sizeof(scratch) - 1, "/license/app/%s", title_id);
-	if (f_opendir(&dr, scratch) == FR_OK) {
+	if (f_opendir(&dr, license_path) == FR_OK) {
 		if (f_readdir(&dr, &fileinfo) == FR_OK) {
-			assert(fileinfo.fname[0] != '\0');
-			snprintf(scratch, sizeof(scratch) - 1, "%s/%s", scratch, fileinfo.fname);
-			f_closedir(&dr);
+			f_closedir(&dr); 
+
+			if (fileinfo.fname[0] != '\0') return 0;
+			snprintf(scratch, sizeof(scratch) - 1, "%s/%s", license_path, fileinfo.fname);
+			
 
 			if (f_open(&fl, scratch, FA_READ) == FR_OK) {
-				uint32_t rd = 0;
 				f_read(&fl, license, sizeof(SceNpDrmLicense), &rd);
 				f_close(&fl);
-
+				
+				if (rd != sizeof(SceNpDrmLicense)) return 0;
 				return 1;
 			}
 
@@ -101,7 +105,6 @@ int main(int argc, char** argv) {
 	int res = -1;
 	char gc_img[0x500] = { 0 };
 	char out_folder[0x500] = { 0 };
-
 
 	if (argc >= 2) {
 		strncpy(gc_img, argv[1], sizeof(gc_img) - 1);
@@ -157,33 +160,51 @@ int main(int argc, char** argv) {
 		uint64_t mbr_start = ftell(img) - SECTOR_SIZE;
 
 		SceMbr* mbr = (SceMbr*)sector;
-		for (int i = 0; i < (sizeof(mbr->partitions) / sizeof(ScePartition)); i++) {
-			if (mbr->partitions[i].code == ScePartitionCode_GRO0 &&
-				mbr->partitions[i].type == ScePartitionType_EXFAT) {
-				uint64_t offset = mbr_start + (mbr->partitions[i].offset * SECTOR_SIZE);
-				uint64_t size = mbr->partitions[i].size * SECTOR_SIZE;
-				
+		if (memcmp(mbr->magic, SCE_MBR_MAGIC, sizeof(mbr->magic)) == 0) {
+			for (int i = 0; i < (sizeof(mbr->partitions) / sizeof(ScePartition)); i++) {
+				if (mbr->partitions[i].code == ScePartitionCode_GRO0 &&
+					mbr->partitions[i].type == ScePartitionType_EXFAT) {
+					uint64_t offset = mbr_start + (mbr->partitions[i].offset * SECTOR_SIZE);
+					uint64_t size = mbr->partitions[i].size * SECTOR_SIZE;
 
-				FATFS fs;
-				ff_init(img, offset, size);
-				if (f_mount(&fs, "0:", 1) == FR_OK) {
-					if (read_recursive("/app", out_folder)) {
-						if (read_license(&license)) {
-							decrypt_klicensee(rif_key, klicensee, &license);
-							if (write_license(&license, klicensee, out_folder)) {
-								res = 0;
+
+					FATFS fs;
+					ff_init(img, offset, size);
+					if (f_mount(&fs, "0:", 1) == FR_OK) {
+						if (read_recursive("/app", out_folder)) {
+							if (read_license(&license)) {
+								decrypt_klicensee(rif_key, klicensee, &license);
+								if (write_license(&license, klicensee, out_folder)) {
+									res = 0;
+								}
+								else {
+									fprintf(stderr, "err: failed to write nonpdrm license file.\n");
+								}
+							}
+							else {
+								fprintf(stderr, "err: failed to read npdrm license file from %s:\n", partition_code_to_name(mbr->partitions[i].code));
 							}
 						}
-
+						else {
+							fprintf(stderr, "err: failed to read one or more files from %s: exFAT partition.\n", partition_code_to_name(mbr->partitions[i].code));
+						}
 					}
-				}
+					else {
+						fprintf(stderr, "err: %s: has an invalid exFAT partition.\n", partition_code_to_name(mbr->partitions[i].code));
+					}
 
-				f_unmount("0:");
-				break;
+					f_unmount("0:");
+					break;
+				}
 			}
 		}
+		else {
+			fprintf(stderr, "err: %s does not contain a valid SceMbr!!!\n", gc_img);
+		}
 
-
+	}
+	else {
+		fprintf(stderr, "err: %s: file not found.\n", gc_img);
 	}
 
 	return res;

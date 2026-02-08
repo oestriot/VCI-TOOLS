@@ -11,6 +11,7 @@
 #include "lib/mbr.h"
 #include "lib/gcauthmgr.h"
 
+static char scratch[0x1028] = { 0 };
 static uint8_t sector[SECTOR_SIZE];
 static uint8_t buffer[SECTOR_SIZE * 0x5000];
 
@@ -39,7 +40,6 @@ int main(int argc, char** argv) {
 	uint8_t dump_raw = 0;
 
 	FATFS fs = { 0 };
-	char scratch[0x500] = { 0 };
 	char gc_img[0x500] = { 0 };
 	char out_folder[0x500] = { 0 };
 
@@ -123,7 +123,7 @@ int main(int argc, char** argv) {
 							res = 0;
 						}
 						else {
-							fprintf(stderr, "failed to read part of %s: exFAT partition!!!\n", partition_name);
+							fprintf(stderr, "failed to read one or more files in the %s: exFAT partition.\n", partition_name);
 							break;
 						}
 
@@ -161,7 +161,7 @@ int main(int argc, char** argv) {
 				f_unmount("0:");
 			}
 			else {
-				fprintf(stderr, "image file has an invalid SceMbr and is also not itself a valid exFAT partition!!!\n");
+				fprintf(stderr, "%s: could not find a valid SceMBR, but also the file is not a valid exFAT partition\n", gc_img);
 			}
 
 		}

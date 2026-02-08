@@ -12,9 +12,8 @@ static uint8_t buffer[SECTOR_SIZE * 0x5000];
 int read_recursive(const char* prev, const char* extract_dir) {
 	int res = 1;
 
-	char path[MAX_PATH] = { 0 };
-	char out_path[MAX_PATH] = { 0 };
-
+	char path[0x1028] = { 0 };
+	char out_path[0x1028] = { 0 };
 
 	FIL fl = { 0 };
 	DIR dr = { 0 };
