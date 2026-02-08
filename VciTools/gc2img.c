@@ -12,13 +12,13 @@
 
 static uint8_t buffer[SECTOR_SIZE * 0x5000];
 
-void dump_image(const FILE* gc_img, const char* img_path, const uint64_t image_size) {
-	uint64_t rd, total = 0;
+void dump_image(FILE* gc_img, const char* img_path, const uint64_t image_size) {
+	uint64_t total = 0;
 	FILE* img = fopen(img_path, "wb");
 
 	do {
-		uint64_t to_read = (((total + sizeof(buffer)) <= image_size) ? sizeof(buffer) : image_size - total);
-		uint64_t rd = fread(buffer, 1, to_read, gc_img);
+		size_t to_read = (size_t)(((total + sizeof(buffer)) <= image_size) ? sizeof(buffer) : image_size - total);
+		size_t rd = fread(buffer, 1, to_read, gc_img);
 
 		if (rd < to_read) memset((buffer + rd), 0x00, (to_read - rd));
 

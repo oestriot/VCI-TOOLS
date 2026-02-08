@@ -19,22 +19,25 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ff\ff.c" />
-    <ClCompile Include="ff\ffsystem.c" />
-    <ClCompile Include="ff\ffunicode.c" />
-    <ClCompile Include="ff\ff_port.c" />
     <ClCompile Include="lib\compat.c" />
     <ClCompile Include="extractgc.c" />
+    <ClCompile Include="lib\exfat.c" />
+    <ClCompile Include="lib\ff\ff.c" />
+    <ClCompile Include="lib\ff\ffsystem.c" />
+    <ClCompile Include="lib\ff\ffunicode.c" />
+    <ClCompile Include="lib\ff\diskio.c" />
     <ClCompile Include="lib\gcauthmgr.c" />
+    <ClCompile Include="lib\mbr.c" />
     <ClCompile Include="lib\path.c" />
     <ClCompile Include="lib\sha1.c" />
     <ClCompile Include="lib\sha256.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ff\ff.h" />
-    <ClInclude Include="ff\ffconf.h" />
-    <ClInclude Include="ff\ff_port.h" />
+    <ClInclude Include="lib\exfat.h" />
     <ClInclude Include="lib\compat.h" />
+    <ClInclude Include="lib\ff\ff.h" />
+    <ClInclude Include="lib\ff\ffconf.h" />
+    <ClInclude Include="lib\ff\diskio.h" />
     <ClInclude Include="lib\mbr.h" />
     <ClInclude Include="lib\gcauthmgr.h" />
     <ClInclude Include="lib\path.h" />
@@ -97,26 +100,26 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IntDir>$(SolutionDir)\build\inter\$(ProjectName)\$(Platform)</IntDir>
-    <OutDir>$(SolutionDir)\build\$(Platform)</OutDir>
+    <IntDir>$(SolutionDir)\build\inter\$(ProjectName)\$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir)\build\$(Platform)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IntDir>$(SolutionDir)\build\inter\$(ProjectName)\$(Platform)</IntDir>
-    <OutDir>$(SolutionDir)\build\$(Platform)</OutDir>
+    <IntDir>$(SolutionDir)\build\inter\$(ProjectName)\$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir)\build\$(Platform)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)\build\$(Platform)</OutDir>
-    <IntDir>$(SolutionDir)\build\inter\$(ProjectName)\$(Platform)</IntDir>
+    <OutDir>$(SolutionDir)\build\$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)\build\inter\$(ProjectName)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)\build\$(Platform)</OutDir>
-    <IntDir>$(SolutionDir)\build\inter\$(ProjectName)\$(Platform)</IntDir>
+    <OutDir>$(SolutionDir)\build\$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)\build\inter\$(ProjectName)\$(Platform)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -132,7 +135,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -146,7 +149,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -162,7 +165,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>

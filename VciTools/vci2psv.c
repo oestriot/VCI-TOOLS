@@ -32,7 +32,8 @@ static void create_psv_header(const VciHeader* vci_header, PsvHeader* psv_header
 int main(int argc, char** argv) {
 
 	int ret = 0;
-	uint64_t rd,total = 0;
+	size_t rd = 0;
+	uint64_t total = 0;
 
 	char vci_file[0x500] = { 0 };
 	char psv_file[0x500] = { 0 };
@@ -82,20 +83,20 @@ int main(int argc, char** argv) {
 			write_file(key_file, &vci_header.keys, sizeof(GcCmd56Keys));
 
 			// initalize sha256 ...
-			SHA256_CTX sha256;
-			sha256_init(&sha256);
+			Sha256Context sha256;
+			Sha256Initialise(&sha256);
 
 			// read & hash all sectors
 			do {
 				rd = fread(buffer, 1, sizeof(buffer), vci);
-				sha256_update(&sha256, buffer, sizeof(buffer));
+				Sha256Update(&sha256, buffer, sizeof(buffer));
 				total += fwrite(buffer, 1, rd, psv);
 
 				printf("%s: %llu / %llu (%.0f%%)\r", psv_file, total, vci_size, (((double)total / (double)vci_size) * 100.0));
 			} while (rd == sizeof(buffer));
 
 			// update the hash in the psv header
-			sha256_final(&sha256, psv_header.all_sectors_sha256);
+			Sha256Finalise(&sha256, psv_header.all_sectors_sha256);
 
 			// write modified header to disk
 			fseek(psv, 0, SEEK_SET);

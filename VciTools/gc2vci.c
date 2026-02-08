@@ -30,7 +30,8 @@ static int verify_keys(const uint8_t* cart_secret, GcCmd56Keys* gc_keys) {
 }
 
 void write_vci(FILE* img, const char* vci_file, const VciHeader* header, const uint64_t img_sz) {
-	uint64_t rd, total = 0;
+	size_t rd = 0;
+	uint64_t total = 0;
 	FILE* vci = fopen(vci_file, "wb");
 
 	// write the VCI header ...
@@ -103,7 +104,7 @@ int main(int argc, char** argv) {
 				write_vci(img, vci_file, &vci_header, img_size);
 			}
 			else {
-				ferror(stderr, "This key file does not match this psv file!");
+				fprintf(stderr, "This key file does not match this psv file!");
 				ret = -1;
 			}
 		}
