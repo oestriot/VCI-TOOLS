@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
 		fread(sector, 1, sizeof(sector), img);
 
 		if (memcmp(mbr->magic, SCE_MBR_MAGIC, sizeof(mbr->magic)) == 0) {
-			create_directories(output_folder, 0);
+			create_directories(output_folder, 1);
 
 			for (size_t i = 0; i < (sizeof(mbr->partitions) / sizeof(ScePartition)); i++) {
 				if (mbr->partitions[i].code == ScePartitionCode_EMPTY) continue;			
