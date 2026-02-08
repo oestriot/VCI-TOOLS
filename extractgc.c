@@ -54,9 +54,10 @@ int main(int argc, char** argv) {
 		strncpy(gc_img, argv[1], sizeof(gc_img) - 1);
 	}
 	else {
-		fprintf(stderr, "Usage: extractgc <gc_image> [dump_raw] [out_file]\n");
+		fprintf(stderr, "Usage: extractgc <gc_image> [dump_raw] [output_folder]\n");
 		fprintf(stderr, "gc_image\tpath to a .img, .psv, or .vci file.\n");
 		fprintf(stderr, "dump_raw\t'true' or 'false'\tdetermines wether to extract disk images, or extract files\n");
+		fprintf(stderr, "output_folder\tpath to save the output files to\n");
 
 		return res;
 	}
