@@ -10,6 +10,8 @@
 #include "lib/mbr.h"
 #include "lib/path.h"
 
+
+static char scratch[0x1028] = { 0 };
 static uint8_t buffer[SECTOR_SIZE * 0x5000];
 
 void dump_image(FILE* gc_img, const char* img_path, const uint64_t image_size) {
@@ -35,7 +37,6 @@ int main(int argc, char** argv) {
 
 	char gc_img_file[0x500] = { 0 };
 	char img_file[0x500] = { 0 };
-	char scratch[0x500] = { 0 };
 
 	if (argc >= 2) {
 		strncpy(gc_img_file, argv[1], sizeof(gc_img_file) - 1);

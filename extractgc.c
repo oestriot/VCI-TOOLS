@@ -12,8 +12,8 @@
 #include "lib/gcauthmgr.h"
 
 static char scratch[0x1028] = { 0 };
-static uint8_t sector[SECTOR_SIZE];
-static uint8_t buffer[SECTOR_SIZE * 0x5000];
+static uint8_t sector[SECTOR_SIZE] = { 0 };
+static uint8_t buffer[SECTOR_SIZE * 0x5000] = { 0 };
 
 void dump_partiton(FILE* img, ScePartition* part, uint64_t mbr_start_pos, const char* output_file) {
 	FILE* partition = fopen(output_file, "wb");
@@ -69,18 +69,22 @@ int main(int argc, char** argv) {
 		FILE* img = fopen(gc_img, "rb");
 		fread(sector, 1, sizeof(sector), img);
 
+		PsvHeader* psv = (PsvHeader*)sector;
 		VciHeader* vci = (VciHeader*)sector;
-		
-		if (memcmp(vci->magic, VCI_MAGIC, sizeof(vci->magic)) == 0 && vci->major_version == VCI_MAJOR_VER) {
+		SceMbr* mbr = (SceMbr*)sector;
+
+		// check for vci header ..
+		if (memcmp(vci->magic, VCI_MAGIC, sizeof(vci->magic)) == 0 && vci->major_version == VCI_MAJOR_VER) { // gctoolkit
 			printf("Detected: vita cartridge image (VCI)\n");
 			
 			// write keys
 			snprintf(scratch, sizeof(scratch) - 1, "%s/gc_cmd56_keys.bin", out_folder);
 			write_file(scratch, &vci->keys, sizeof(GcCmd56Keys));
-			
+
+			// seek to MBR
+			fseek(img, sizeof(VciHeader), SEEK_SET);
 		}
-		PsvHeader* psv = (PsvHeader*)sector;
-		if (memcmp(psv->magic, PSV_MAGIC, sizeof(psv->magic)) == 0 && psv->version == PSV_VER) {
+		if (memcmp(psv->magic, PSV_MAGIC, sizeof(psv->magic)) == 0 && psv->version == PSV_VER) { // psvgamesd
 			printf("Detected: psvgamesd (PSV)\n");
 			
 			// write cart secret
@@ -95,11 +99,16 @@ int main(int argc, char** argv) {
 			fseek(img, psv->image_offset * SECTOR_SIZE, SEEK_SET);
 			
 		}
+		if (memcmp(mbr->magic, SCE_MBR_MAGIC, sizeof(mbr->magic)) == 0) { // raw img
+			printf("Detected: raw (img)\n");
+
+			// seek to MBR
+			fseek(img, 0, SEEK_SET);
+		}
 		
 		// Read MBR
 		uint64_t mbr_start_pos = ftell(img);
 		fread(sector, 1, sizeof(sector), img);
-		SceMbr* mbr = (SceMbr*)sector;
 
 		if (memcmp(mbr->magic, SCE_MBR_MAGIC, sizeof(mbr->magic)) == 0) {
 			for (size_t i = 0; i < (sizeof(mbr->partitions) / sizeof(ScePartition)); i++) {

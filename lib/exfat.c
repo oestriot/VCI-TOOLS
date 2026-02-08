@@ -6,7 +6,7 @@
 #include "ff/diskio.h"
 #include "ff/ff.h"
 
-static uint8_t buffer[SECTOR_SIZE * 0x5000];
+static uint8_t buffer[SECTOR_SIZE * 0x5000] = { 0 };
 #define RETERR() {res = 0; break;}
 
 int read_recursive(const char* prev, const char* extract_dir) {

@@ -18,6 +18,8 @@
 #include <time.h>
 #include <assert.h>
 static char scratch[0x1028] = { 0 };
+static uint8_t sector[SECTOR_SIZE] = { 0 };
+
 
 int read_title_id(char* title_id) {
 	FIL fl = { 0 };
@@ -120,7 +122,6 @@ int main(int argc, char** argv) {
 	if (file_exists(gc_img)) {
 		FILE* img = fopen(gc_img, "rb");
 		
-		uint8_t sector[SECTOR_SIZE] = { 0 };
 		fread(sector, 1, sizeof(sector), img);
 
 		PsvHeader* psv_header = (PsvHeader*)sector;
