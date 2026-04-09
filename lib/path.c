@@ -19,12 +19,12 @@ void create_directories(const char* dir_name, uint8_t including_last) {
 	for (size_t i = 0; i < strlen(dir_name); i++) {
 		if (dir_name[i] == '/') {
 			strncpy(last_dir, dir_name, i);
-			mkdir(last_dir, 744);
+			mkdir(last_dir, 0744);
 		}
 	}
 
 	if (including_last) {
-		mkdir(dir_name, 744);
+		mkdir(dir_name, 0744);
 	}
 }
 
