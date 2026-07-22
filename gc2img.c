@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
 			
 			// write out cart secret and cart hash ..
 
-			change_extension("-cart_secret.bin", gc_img_file, sizeof(gc_img_file), scratch);
+			change_extension("-key.bin", gc_img_file, sizeof(gc_img_file), scratch);
 			write_file(scratch, psv_header->cart_secret, sizeof(psv_header->cart_secret));
 
 			change_extension("-cart_hash.bin", gc_img_file, sizeof(gc_img_file), scratch);

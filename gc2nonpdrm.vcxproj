@@ -22,6 +22,7 @@
     <ClCompile Include="gc2nonpdrm.c" />
     <ClCompile Include="lib\aes.c" />
     <ClCompile Include="lib\compat.c" />
+    <ClCompile Include="lib\crypto.c" />
     <ClCompile Include="lib\exfat.c" />
     <ClCompile Include="lib\ff\diskio.c" />
     <ClCompile Include="lib\ff\ff.c" />
@@ -38,6 +39,7 @@
   <ItemGroup>
     <ClInclude Include="lib\aes.h" />
     <ClInclude Include="lib\compat.h" />
+    <ClInclude Include="lib\crypto.h" />
     <ClInclude Include="lib\exfat.h" />
     <ClInclude Include="lib\ff\diskio.h" />
     <ClInclude Include="lib\ff\ff.h" />

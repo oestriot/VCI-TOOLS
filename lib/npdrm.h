@@ -1,14 +1,33 @@
-#ifndef _NPDRM_H
-#define _NPDRM_H 
+#ifndef NPDRM_H
+#define NPDRM_H 
 #include "compat.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 
+#define KLICENSEE_SIZE (0x10)
+
 typedef PACK(struct SceNpBindData {
-	uint8_t cart_secret[0x20];
+	uint8_t key[0x20];
 	uint8_t license[0x70];
 }) SceNpBindData;
+
+typedef PACK(struct SceNpDrmActivationData { // size is 0x1038
+	uint16_t act_type;
+	uint16_t version_flag;
+	uint32_t version;
+	uint64_t account_id;
+	uint8_t primary_key_table[0x80][0x10];
+	uint8_t unk1[0x40];
+	uint8_t openpsid[0x10];
+	uint8_t unk2[0x10];
+	uint8_t unk3[0x10];
+	uint8_t secondary_key_table[0x65][0x10];
+	uint8_t rsa_signature[0x100];
+	uint8_t unk_sigmature[0x40];
+	uint8_t ecdsa_signature[0x28]; // checked by pspemu, and SceNpDrm.
+}) SceNpDrmActivationData;
+static_assert(sizeof(SceNpDrmActivationData) == 0x1038, "Invalid size for SceNpDrmActivationData");
 
 typedef PACK(struct SceNpDrmLicense { // size is 0x200
 	int16_t version;       // -1 VITA (NPDRM_FREE), 0 PSP, 1 PSP-VITA
@@ -35,6 +54,8 @@ typedef PACK(struct SceNpDrmLicense { // size is 0x200
 }) SceNpDrmLicense;
 static_assert(sizeof(SceNpDrmLicense) == 0x200, "Invalid size for SceNpDrmLicense");
 
-void decrypt_klicensee(uint8_t* rif_key, uint8_t* klicensee, SceNpDrmLicense* license);
+void init_npdrm(uint8_t* cart_secret, uint8_t* console_id, SceNpDrmActivationData* activation_data);
+int decrypt_klicensee(uint8_t* klicensee, SceNpDrmLicense* license, int vita);
+int make_nonpdrm_license(SceNpDrmLicense* license, uint8_t* klicensee);
 
 #endif

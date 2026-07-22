@@ -32,9 +32,9 @@
     <ClCompile Include="lib\mbr.c" />
     <ClCompile Include="lib\npdrm.c" />
     <ClCompile Include="lib\path.c" />
-    <ClCompile Include="gc2vci.c" />
     <ClCompile Include="lib\sha1.c" />
     <ClCompile Include="lib\sha256.c" />
+    <ClCompile Include="npdrm2nonpdrm.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\aes.h" />
@@ -57,10 +57,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{565770E2-65F7-4AFE-AFE6-9258739E1148}</ProjectGuid>
+    <ProjectGuid>{43CB478C-81FB-44A7-9EF9-C4F975387D9F}</ProjectGuid>
     <RootNamespace>VciTools</RootNamespace>
     <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
-    <ProjectName>gc2vci</ProjectName>
+    <ProjectName>npdrm2nonpdrm</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
