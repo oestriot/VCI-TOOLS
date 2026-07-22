@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
 					ff_init(img, offset, size);
 					if (f_mount(&fs, "0:", 1) == FR_OK) {
 						
-						if (read_recursive("", "", scratch)) {
+						if (read_recursive("", scratch)) {
 							res = 0;
 						}
 						else {

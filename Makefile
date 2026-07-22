@@ -2,7 +2,7 @@ CC = gcc
 OUTDIR = build
 CFLAGS = -O3 -fPIC -static
 OBJ = lib/aes.o lib/exfat.o lib/gcauthmgr.o lib/hmac_sha256.o \
-	  lib/mbr.o lib/npdrm.o lib/path.o lib/sha1.o lib/sha256.o 
+	  lib/mbr.o lib/npdrm.o lib/path.o lib/sha1.o lib/sha256.o \
 	  lib/crypto.o lib/ff/ff.o lib/ff/ffsystem.o lib/ff/ffunicode.o \
 	  lib/ff/diskio.o 
 
