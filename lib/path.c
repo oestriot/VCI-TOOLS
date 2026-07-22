@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include "compat.h"
+#include "path.h"
 
 uint64_t get_filesize(FILE* file) {
 	uint64_t pos = ftell(file);
@@ -77,9 +78,30 @@ void change_extension(const char* extension, const char* path, size_t path_sz, c
 	strncat(dest, extension, path_sz - 1);
 }
 
+const char* remove_first_folder(const char* folder) {
+	folder = strip_prefix_slash(folder);
+
+	while (folder[0] != '/' && folder[0] != '\0') {
+		folder++;
+	}
+
+	if (folder[0] == '/') folder++;
+
+	return folder;
+}
+
 void remove_trailing_slash(char* path ) {
 	size_t path_sz = strlen(path);
 
 	if (path[path_sz - 1] == '/')
 		path[path_sz - 1] = '\0';
+}
+
+
+const char* strip_prefix_slash(const char* path)
+{
+	if (path[0] == '/') {
+		path++;
+	}
+	return path;
 }

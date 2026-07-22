@@ -6,7 +6,7 @@ OBJ = lib/aes.o lib/exfat.o lib/gcauthmgr.o lib/hmac_sha256.o \
 	  lib/crypto.o lib/ff/ff.o lib/ff/ffsystem.o lib/ff/ffunicode.o \
 	  lib/ff/diskio.o 
 
-all: build extractgc gc2img gc2nonpdrm gc2vci vci2psv
+all: build extractgc gc2img gc2nonpdrm gc2vci vci2psv npdrm2nonpdrm
 
 .PHONY: build
 build:
@@ -34,4 +34,6 @@ gc2vci: $(OBJ) gc2vci.o
 	
 vci2psv: $(OBJ) vci2psv.o
 	$(CC) -o $(OUTDIR)/$@ $^ $(CFLAGS)
-
+	
+npdrm2nonpdrm: $(OBJ) npdrm2nonpdrm.o
+	$(CC) -o $(OUTDIR)/$@ $^ $(CFLAGS)

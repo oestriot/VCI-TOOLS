@@ -135,7 +135,6 @@ int decrypt_klicensee(uint8_t* klicensee, SceNpDrmLicense* license, int vita) {
 
 // NoNpDrm;
 
-
 int make_nonpdrm_license(SceNpDrmLicense* license, uint8_t* klicensee) {
 
 	SceNpDrmLicense new_license = { 0 };

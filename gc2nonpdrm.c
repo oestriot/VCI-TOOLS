@@ -21,12 +21,37 @@ static char scratch[0x1028] = { 0 };
 static uint8_t sector[SECTOR_SIZE] = { 0 };
 
 
-int read_title_id(char* title_id) {
+#define CREATE_NONPDRM(copy_folder, install_folder) \
+	read_title_id(copy_folder, title_id); \
+	if (read_recursive(copy_folder, out_folder)) { \
+		if (read_license(install_folder, &license, title_id, license_path, sizeof(license_path))) { \
+			if (decrypt_klicensee(klicensee, &license, 1)) { \
+				if (make_nonpdrm_license(&license, klicensee)) { \
+					snprintf(scratch, sizeof(scratch) - 1, "%s/%s/%s/sce_sys/package/work.bin", out_folder, strip_prefix_slash(copy_folder), license_path); \
+					write_file(scratch, &license, sizeof(SceNpDrmLicense)); \
+				} \
+				else { \
+					fprintf(stderr, "err: failed to write nonpdrm license file.\n"); \
+				} \
+			} \
+			else { \
+				fprintf(stderr, "err: failed to decrypt klicensee.\n"); \
+			} \
+		} \
+		else { \
+			fprintf(stderr, "err: failed to read npdrm license file from %s:/license/%s/%s\n", partition_code_to_name(mbr->partitions[i].code), strip_prefix_slash(install_folder), strip_prefix_slash(title_id)); \
+		} \
+	} else { \
+			fprintf(stderr, "err: could not read file in %s:/%s/\n", partition_code_to_name(mbr->partitions[i].code), strip_prefix_slash(copy_folder)); \
+	}
+
+
+int read_title_id(const char* folder, char* title_id) {
 	FIL fl = { 0 };
 	DIR dr = { 0 };
 	FILINFO fileinfo = { 0 };
 
-	if (f_opendir(&dr, "/app") == FR_OK) {
+	if (f_opendir(&dr, folder) == FR_OK) {
 		if (f_readdir(&dr, &fileinfo) == FR_OK) {
 			assert(fileinfo.fname[0] != '\0');
 			strncpy(title_id, fileinfo.fname, 9);
@@ -38,8 +63,7 @@ int read_title_id(char* title_id) {
 }
 
 
-int read_license(SceNpDrmLicense* license) {
-	char title_id[0x10] = { 0 };
+int read_license(const char* root, SceNpDrmLicense* license, char* subfolder, char* final_path, size_t sz) {
 	char license_path[0x500] = { 0 };
 
 	FIL fl = { 0 };
@@ -47,12 +71,16 @@ int read_license(SceNpDrmLicense* license) {
 	FILINFO fileinfo = { 0 };
 	uint32_t rd = 0;
 
-	read_title_id(title_id);
-	snprintf(license_path, sizeof(license_path) - 1, "/license/app/%s", title_id);
+	snprintf(license_path, sizeof(license_path) - 1, "/license/%s/%s", strip_prefix_slash(root), subfolder);
 
 	if (f_opendir(&dr, license_path) == FR_OK) {
 		if (f_readdir(&dr, &fileinfo) == FR_OK) {
 			f_closedir(&dr);
+
+			if ((fileinfo.fattrib & AM_DIR) != 0) {
+				snprintf(final_path, sz, "%s/%s", subfolder, fileinfo.fname);
+				return read_license(root, license, final_path, final_path, sz);
+			}
 
 			if (fileinfo.fname[0] == '\0') return 0;
 			snprintf(scratch, sizeof(scratch) - 1, "%s/%s", license_path, fileinfo.fname);
@@ -60,7 +88,7 @@ int read_license(SceNpDrmLicense* license) {
 			if (f_open(&fl, scratch, FA_READ) == FR_OK) {
 				f_read(&fl, license, sizeof(SceNpDrmLicense), &rd);
 				f_close(&fl);
-				
+
 				if (rd < sizeof(SceNpDrmLicense)) return 0;
 				return 1;
 			}
@@ -75,12 +103,13 @@ int main(int argc, char** argv) {
 	int res = -1;
 	char gc_img[0x500] = { 0 };
 	char out_folder[0x500] = { 0 };
+	char license_path[0x500] = { 0 };
 
 	if (argc >= 2) {
 		strncpy(gc_img, argv[1], sizeof(gc_img) - 1);
 	}
 	else {
-		fprintf(stderr, "Usage: gc2nonpdrm <vci or psv> [out folder]\n");
+		fprintf(stderr, "Usage: gc2nonpdrm <vci or psv> [out root]\n");
 		return -1;
 	}
 
@@ -134,37 +163,18 @@ int main(int argc, char** argv) {
 					mbr->partitions[i].type == ScePartitionType_EXFAT) {
 					uint64_t offset = mbr_start + (mbr->partitions[i].offset * SECTOR_SIZE);
 					uint64_t size = mbr->partitions[i].size * SECTOR_SIZE;
-
+					
+					// do not have act.dat or consoleid, so just leave it with only cart_secret;
+					init_npdrm(cart_secret, NULL, NULL);
 
 					FATFS fs;
 					ff_init(img, offset, size);
 					if (f_mount(&fs, "0:", 1) == FR_OK) {
-						read_title_id(title_id);
-						if (read_recursive("/app", out_folder)) {
-							if (read_license(&license)) {
-								init_npdrm(cart_secret, NULL, NULL);
-								if (decrypt_klicensee(klicensee, &license, 1)) {
-									if (make_nonpdrm_license(&license, klicensee)) {
-										snprintf(scratch, sizeof(scratch) - 1, "%s/app/%s/sce_sys/package/work.bin", out_folder, title_id);
-										write_file(scratch, &license, sizeof(SceNpDrmLicense));
+						CREATE_NONPDRM("/app", "app");
+						CREATE_NONPDRM("/appinst", "app");
+						CREATE_NONPDRM("/acinst", "addcont");
 
-										res = 0;
-									}
-									else {
-										fprintf(stderr, "err: failed to write nonpdrm license file.\n");
-									}
-								}
-								else {
-									fprintf(stderr, "err: failed to decrypt klicensee.\n");
-								}
-							}
-							else {
-								fprintf(stderr, "err: failed to read npdrm license file from %s:\n", partition_code_to_name(mbr->partitions[i].code));
-							}
-						}
-						else {
-							fprintf(stderr, "err: failed to read one or more files from %s: exFAT partition.\n", partition_code_to_name(mbr->partitions[i].code));
-						}
+						return 0;
 					}
 					else {
 						fprintf(stderr, "err: %s: has an invalid exFAT partition.\n", partition_code_to_name(mbr->partitions[i].code));

@@ -20,7 +20,7 @@ void hex2bin(char* bytes, size_t len, const char* hexstr)
 }
 
 
-int log_buffer(char* header, uint8_t* buffer, size_t sz) {
+void log_buffer(char* header, uint8_t* buffer, size_t sz) {
 	printf("%s", header);
 	for (int i = 0; i < sz; i++) {
 		printf("%02X", buffer[i]);

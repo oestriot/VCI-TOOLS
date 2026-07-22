@@ -11,4 +11,7 @@ void extract_dirname(const char* filename, char* dirname);
 void create_directories(const char* dir_name, uint8_t including_last);
 void remove_trailing_slash(char* path);
 
+const char* strip_prefix_slash(const char* path);
+const char* remove_first_folder(const char* folder);
+
 #endif
