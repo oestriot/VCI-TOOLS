@@ -2,6 +2,7 @@
 #include "psv.h"
 #include "hmac_sha256.h"
 #include "crypto.h"
+#include "compat.h"
 
 #include <stdio.h>
 #include <stdlib.h>

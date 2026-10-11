@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "lib/compat.h"
 #include "lib/npdrm.h"
 #include "lib/path.h"
@@ -30,7 +32,7 @@ void log_buffer(char* header, uint8_t* buffer, size_t sz) {
 
 int is_zeros(uint8_t* buffer, size_t sz) {
 	for (int i = 0; i < buffer[i]; i++) {
-		if (buffer[i] != 0) return 0;
+		if(buffer[i] != 0) return 0;
 	}
 	return 1;
 }
@@ -88,7 +90,7 @@ int main(int argc, char** argv) {
 		}
 
 
-		init_npdrm(NULL, !is_zeros(console_id, sizeof(console_id)) ? NULL : console_id, !is_zeros(&activation, sizeof(activation)) ? NULL : &activation);
+		init_npdrm(NULL, !is_zeros(console_id, sizeof(console_id)) ? NULL : console_id, !is_zeros((uint8_t*)&activation, sizeof(activation)) ? NULL : &activation);
 		if (decrypt_klicensee(klicensee, &license, 1)) {
 			log_buffer("got klicensee: ", klicensee, KLICENSEE_SIZE);
 			if (make_nonpdrm_license(&license, klicensee)) {

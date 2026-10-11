@@ -9,14 +9,6 @@
 #include <direct.h>
 #include <Windows.h>
 
-#ifdef _DEBUG
-#define LOG(...) printf(__VA_ARGS__)
-#else
-#define LOG(...) /* ... */
-#endif
-
-#define MIN(x, y) (x < y ? x : y)
-
 #define ftell _ftelli64
 #define fseek _fseeki64
 #define fopen utf8_fopen
@@ -31,8 +23,14 @@ extern int utf8_main(int argc, char** argv);
 
 #endif
 
+
+#ifdef _DEBUG
+#define LOG(...) printf(__VA_ARGS__)
+#else
+#define LOG(...) /* ... */
 #endif
 
+#define MIN(x, y) (x < y ? x : y)
 #ifdef __GNUC__
 #define PACK( declaration ) declaration __attribute__((__packed__))
 #define swap16 __builtin_bswap16
@@ -42,3 +40,6 @@ extern int utf8_main(int argc, char** argv);
 #define swap32 _byteswap_ulong
 #define PACK( declaration ) __pragma(pack(push, 1) ) declaration __pragma(pack(pop))
 #endif
+
+#endif
+
