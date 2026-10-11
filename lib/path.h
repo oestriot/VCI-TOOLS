@@ -9,9 +9,10 @@ void read_file(const char* filename, void* data, size_t size);
 void write_file(const char* filename, const void* data, size_t size);
 void extract_dirname(const char* filename, char* dirname);
 void create_directories(const char* dir_name, uint8_t including_last);
-void remove_trailing_slash(char* path);
+void strip_trailing_slash(char* path);
 
 const char* strip_prefix_slash(const char* path);
 const char* remove_first_folder(const char* folder);
+char* trim_path(char* path);
 
 #endif

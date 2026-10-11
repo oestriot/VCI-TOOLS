@@ -27,22 +27,22 @@ static uint8_t sector[SECTOR_SIZE] = { 0 };
 		if (read_license(install_folder, &license, title_id, license_path, sizeof(license_path))) { \
 			if (decrypt_klicensee(klicensee, &license, 1)) { \
 				if (make_nonpdrm_license(&license, klicensee)) { \
-					snprintf(scratch, sizeof(scratch) - 1, "%s/%s/%s/sce_sys/package/work.bin", out_folder, strip_prefix_slash(copy_folder), license_path); \
+					snprintf(scratch, sizeof(scratch) - 1, "%s/%s/%s/sce_sys/package/work.bin", trim_path(out_folder), trim_path(copy_folder), trim_path(license_path)); \
 					write_file(scratch, &license, sizeof(SceNpDrmLicense)); \
 				} \
 				else { \
-					fprintf(stderr, "err: failed to write nonpdrm license file.\n"); \
+					fprintf(stderr, "warn: failed to write nonpdrm license file.\n"); \
 				} \
 			} \
 			else { \
-				fprintf(stderr, "err: failed to decrypt klicensee.\n"); \
+				fprintf(stderr, "warn: failed to decrypt klicensee.\n"); \
 			} \
 		} \
 		else { \
-			fprintf(stderr, "err: failed to read npdrm license file from %s:/license/%s/%s\n", partition_code_to_name(mbr->partitions[i].code), strip_prefix_slash(install_folder), strip_prefix_slash(title_id)); \
+			fprintf(stderr, "warn: failed to read npdrm license file from %s:/license/%s/%s\n", partition_code_to_name(mbr->partitions[i].code), trim_path(install_folder), trim_path(title_id)); \
 		} \
 	} else { \
-			fprintf(stderr, "err: could not read file in %s:/%s/\n", partition_code_to_name(mbr->partitions[i].code), strip_prefix_slash(copy_folder)); \
+			fprintf(stderr, "warn: could not read file in %s:/%s/\n", partition_code_to_name(mbr->partitions[i].code), trim_path(copy_folder)); \
 	}
 
 
@@ -71,19 +71,21 @@ int read_license(const char* root, SceNpDrmLicense* license, char* subfolder, ch
 	FILINFO fileinfo = { 0 };
 	uint32_t rd = 0;
 
-	snprintf(license_path, sizeof(license_path) - 1, "/license/%s/%s", strip_prefix_slash(root), subfolder);
+	snprintf(license_path, sizeof(license_path) - 1, "/license/%s/%s", trim_path(root), trim_path(subfolder));
 
 	if (f_opendir(&dr, license_path) == FR_OK) {
 		if (f_readdir(&dr, &fileinfo) == FR_OK) {
 			f_closedir(&dr);
 
 			if ((fileinfo.fattrib & AM_DIR) != 0) {
-				snprintf(final_path, sz, "%s/%s", subfolder, fileinfo.fname);
+				snprintf(final_path, sz, "%s/%s", trim_path(subfolder), trim_path(fileinfo.fname));
 				return read_license(root, license, final_path, final_path, sz);
 			}
 
+			if (final_path[0] == '\0') strncpy(final_path, trim_path(subfolder), MIN(sz, strlen(trim_path(subfolder))));
 			if (fileinfo.fname[0] == '\0') return 0;
-			snprintf(scratch, sizeof(scratch) - 1, "%s/%s", license_path, fileinfo.fname);
+
+			snprintf(scratch, sizeof(scratch) - 1, "%s/%s", trim_path(license_path), trim_path(fileinfo.fname));
 
 			if (f_open(&fl, scratch, FA_READ) == FR_OK) {
 				f_read(&fl, license, sizeof(SceNpDrmLicense), &rd);
@@ -92,7 +94,6 @@ int read_license(const char* root, SceNpDrmLicense* license, char* subfolder, ch
 				if (rd < sizeof(SceNpDrmLicense)) return 0;
 				return 1;
 			}
-
 		}
 	}
 
@@ -130,8 +131,8 @@ int main(int argc, char** argv) {
 		VciHeader* vci_header = (VciHeader*)sector;
 
 		uint8_t cart_secret[0x20]	= { 0 };
-		uint8_t rif_hash[0x14]  = { 0 };
-		uint8_t klicensee[0x20] = { 0 };
+		uint8_t rif_hash[0x14]      = { 0 };
+		uint8_t klicensee[0x20]     = { 0 };
 
 		SceNpDrmLicense license;
 

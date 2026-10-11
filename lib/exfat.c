@@ -20,16 +20,12 @@ int read_recursive(const char* prev, const char* extract_dir) {
 	FILINFO fileinfo = { 0 };
 
 	if (f_opendir(&dr, prev) == FR_OK) {
-		remove_trailing_slash((char*)prev);
-		remove_trailing_slash((char*)extract_dir);
 
 		do {
 			if (f_readdir(&dr, &fileinfo) != FR_OK || fileinfo.fname[0] == '\0') break;
 
-
-
-			snprintf(path, sizeof(path) - 1, "%s/%s", prev, strip_prefix_slash(fileinfo.fname));
-			snprintf(out_path, sizeof(out_path) - 1, "%s/%s/%s", extract_dir, strip_prefix_slash(prev), strip_prefix_slash(fileinfo.fname));
+			snprintf(path, sizeof(path) - 1, "%s/%s", trim_path(prev), trim_path(fileinfo.fname));
+			snprintf(out_path, sizeof(out_path) - 1, "%s/%s/%s", trim_path(extract_dir), trim_path(prev), trim_path(fileinfo.fname));
 
 			if ((fileinfo.fattrib & AM_DIR) != 0) {
 				printf("%s: %llu / %llu (%.0f%%)\n", out_path, 1llu, 1llu, 100.0f);

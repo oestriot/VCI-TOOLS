@@ -69,12 +69,16 @@ void extract_dirname(const char* filename, char* dirname) {
 void change_extension(const char* extension, const char* path, size_t path_sz, char* dest) {
 	strncpy(dest, path, path_sz - 1);
 
+	size_t dot_location = -1;
 	for (size_t i = 0; i < strnlen(dest, path_sz - 1); i++) {
-		if (dest[i] == '.') {
-			strncpy(dest + i, extension, (path_sz - i) - 1);
-			return;
-		}
+		if (dest[i] == '.') dot_location = i;
 	}
+
+	if (dot_location > 0) {
+		strncpy(dest + dot_location, extension, (path_sz - dot_location) - 1);
+		return;
+	}
+
 	strncat(dest, extension, path_sz - 1);
 }
 
@@ -90,7 +94,7 @@ const char* remove_first_folder(const char* folder) {
 	return folder;
 }
 
-void remove_trailing_slash(char* path ) {
+void strip_trailing_slash(char* path) {
 	size_t path_sz = strlen(path);
 
 	if (path[path_sz - 1] == '/')
@@ -104,4 +108,10 @@ const char* strip_prefix_slash(const char* path)
 		path++;
 	}
 	return path;
+}
+
+char* trim_path(char* path) {
+	char* norm = strip_prefix_slash(path);
+	strip_trailing_slash(path);
+	return norm;
 }

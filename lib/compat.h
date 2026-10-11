@@ -9,6 +9,14 @@
 #include <direct.h>
 #include <Windows.h>
 
+#ifdef _DEBUG
+#define LOG(...) printf(__VA_ARGS__)
+#else
+#define LOG(...) /* ... */
+#endif
+
+#define MIN(x, y) (x < y ? x : y)
+
 #define ftell _ftelli64
 #define fseek _fseeki64
 #define fopen utf8_fopen
