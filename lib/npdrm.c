@@ -26,6 +26,7 @@ static SceNpDrmActivationData NPDRM_ACTIVATION_DATA = { 0 };
 static uint8_t CART_SECRET[0x20] = { 0 };
 static uint8_t CONSOLE_ID[0x10] = { 0 };
 static uint8_t ACTIVATED = 0;
+static uint8_t CART_INSERTED = 0;
 
 
 int decrypt_keyid(uint8_t* key_id_block) {
@@ -51,17 +52,9 @@ void decrypt_key_table() {
 	ACTIVATED = 1;
 }
 
-void init_npdrm(uint8_t* cart_secret, uint8_t* console_id, SceNpDrmActivationData* activation_data) {
-	if (cart_secret != NULL) { memcpy(CART_SECRET, cart_secret, sizeof(CART_SECRET)); }
-	if (console_id != NULL) memcpy(CONSOLE_ID, console_id, sizeof(CONSOLE_ID));
-	if (activation_data != NULL) memcpy(&NPDRM_ACTIVATION_DATA, activation_data, sizeof(NPDRM_ACTIVATION_DATA));
-
-	if (activation_data != NULL && console_id != NULL) decrypt_key_table();
-}
-
-
 void set_cart_secret(uint8_t* cart_secret) {
 	memcpy(CART_SECRET, cart_secret, sizeof(CART_SECRET));
+	CART_INSERTED = 1;
 }
 
 void set_console_id(uint8_t* console_id) {
@@ -71,6 +64,15 @@ void set_console_id(uint8_t* console_id) {
 void set_activation_data(uint8_t* activation_data) {
 	memcpy(&NPDRM_ACTIVATION_DATA, activation_data, sizeof(NPDRM_ACTIVATION_DATA));
 }
+
+
+void init_npdrm(uint8_t* cart_secret, uint8_t* console_id, SceNpDrmActivationData* activation_data) {
+	if (cart_secret != NULL) { set_cart_secret(cart_secret); }
+	if (console_id != NULL) { set_console_id(console_id); }
+	if (activation_data != NULL) { set_activation_data(activation_data); }
+	if (activation_data != NULL && console_id != NULL) { decrypt_key_table(); }
+}
+
 
 void decrypt_bind_data(char* key, size_t keyLen, char* bindData, size_t bindDataLen) {
 	uint8_t bind_hmac[0x20] = { 0 };
@@ -89,6 +91,7 @@ void decrypt_bind_data(char* key, size_t keyLen, char* bindData, size_t bindData
 int decrypt_klicensee(uint8_t* klicensee, SceNpDrmLicense* license, int vita) {
 	SceNpBindData bind_data = { 0 };
 	
+	LOG("License Flags: %llx\n", license->license_flags);
 	uint8_t digital_flag = (((license->license_flags & 0xff) << 8) & 0x7ff) >> 10 == 0;
 	uint8_t psp_flag = ((vita == 0) & ~((((license->license_flags & 0xff) << 8) & 0x7ff) >> 10)) != 0;
 	uint8_t drmbind_flag = (license->license_flags >> 8) != 0b00001101;
@@ -103,15 +106,15 @@ int decrypt_klicensee(uint8_t* klicensee, SceNpDrmLicense* license, int vita) {
 
 	if (key_flag & 0x400 && license->license_flags != 0) {
 		if (licenseType == 0) {
-			LOG("Would check ecdsa signature..\n");
+			LOG("[RIF] ecdsa check enabled\n");
 		}
-		LOG("Would use RSA key 1\n");
+		LOG("[RIF] Would use RSA key 1\n");
 	}
 	else if(license->license_flags == 0) {
-		LOG("Would use RSA key 2.\n");
+		LOG("[RIF] Would use RSA key 2.\n");
 	}
 	else {
-		LOG("Would use RSA key 3.\n");
+		LOG("[RIF] Would use RSA key 3.\n");
 	}
 
 
@@ -150,6 +153,7 @@ int decrypt_klicensee(uint8_t* klicensee, SceNpDrmLicense* license, int vita) {
 			memcpy(klicensee, license->key1, KLICENSEE_SIZE);
 		}
 		else {
+			if (!CART_INSERTED) return 0;
 			memcpy(bind_data.key, CART_SECRET, sizeof(bind_data.key));
 		}
 	}
