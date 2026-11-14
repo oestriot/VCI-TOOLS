@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "lib/compat.h"
 #include "lib/vci.h"
@@ -41,7 +42,7 @@ void write_vci(FILE* img, const char* vci_file, const VciHeader* header, const u
 		rd = fread(buffer, 1, sizeof(buffer), img);
 		total += fwrite(buffer, 1, rd, vci);
 
-		printf("%s: %llu / %llu (%.0f%%)\r", vci_file, total, img_sz, (((double)total / (double)img_sz) * 100.0));
+		printf("%s: %"PRIu64" / %"PRIu64" (%.0f%%)\r", vci_file, total, img_sz, (((double)total / (double)img_sz) * 100.0));
 	} while (rd == sizeof(buffer));
 
 	fclose(vci);

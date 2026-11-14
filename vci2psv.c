@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdarg.h>
+#include <inttypes.h>
 
 #include "lib/compat.h"
 #include "lib/vci.h"
@@ -92,7 +93,7 @@ int main(int argc, char** argv) {
 				Sha256Update(&sha256, buffer, sizeof(buffer));
 				total += fwrite(buffer, 1, rd, psv);
 
-				printf("%s: %llu / %llu (%.0f%%)\r", psv_file, total, vci_size, (((double)total / (double)vci_size) * 100.0));
+				printf("%s: %"PRIu64" / %"PRIu64" (%.0f%%)\r", psv_file, total, vci_size, (((double)total / (double)vci_size) * 100.0));
 			} while (rd == sizeof(buffer));
 
 			// update the hash in the psv header

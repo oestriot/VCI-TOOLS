@@ -24,22 +24,6 @@ extern int utf8_main(int argc, char** argv);
 
 #endif
 
-#ifdef _DEBUG
-#define LOGGING_ENABLED 1
-#endif
-
-#ifdef LOGGING_ENABLED
-#define LOG(...) printf(__VA_ARGS__); 
-#define LOG_BOOL(label, b) LOG("%s: %s\n", label, b ? "True" : "False");
-#define LOG_BUFFER(label, buf, sz) do { LOG("%s:", label); for(size_t i = 0; i < sz; i++) { LOG(" %02X", ((uint8_t*)(buf))[i]); } LOG("\n"); } while(0);
-#define LOG_LINE(...) do { LOG(__VA_ARGS__); LOG("\n"); } while(0);
-#else 
-#define LOG(...) /*...*/
-#define LOG_BOOL(...) /*...*/
-#define LOG_BUFFER(...) /*...*/
-#define LOG_LINE(...) /*...*/
-#endif
-
 #define MIN(x, y) (x < y ? x : y)
 #ifdef __GNUC__
 #define PACK( declaration ) declaration __attribute__((__packed__))

@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdarg.h>
+#include <inttypes.h>
 
 #include "lib/compat.h"
 #include "lib/vci.h"
@@ -25,7 +26,7 @@ void dump_image(FILE* gc_img, const char* img_path, const uint64_t image_size) {
 		if (rd < to_read) memset((buffer + rd), 0x00, (to_read - rd));
 
 		total += fwrite(buffer, 1, to_read, img);
-		printf("%s: %llu / %llu (%.0f%%)\r", img_path, total, image_size, (((double)total / (double)image_size) * 100.0));
+		printf("%s: %"PRIu64" / %"PRIu64" (%.0f%%)\r", img_path, total, image_size, (((double)total / (double)image_size) * 100.0));
 	} while (total < image_size);
 
 	fclose(img);

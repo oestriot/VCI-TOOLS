@@ -27,7 +27,7 @@ static uint8_t sector[SECTOR_SIZE] = { 0 };
 		if (read_license(install_folder, &license, title_id, license_path, sizeof(license_path))) { \
 			if (decrypt_klicensee(klicensee, &license, 1)) { \
 				if (make_nonpdrm_license(&license, klicensee)) { \
-					snprintf(scratch, sizeof(scratch) - 1, "%s/%s/%s/sce_sys/package/work.bin", trim_path(out_folder), trim_path(copy_folder), trim_path(license_path)); \
+					snprintf(scratch, sizeof(scratch) - 1, "%s/%s/%s/sce_sys/package/work.bin", trim_path((char*)out_folder), trim_path(copy_folder), trim_path(license_path)); \
 					file_write(scratch, &license, sizeof(SceNpDrmLicense)); \
 				} \
 				else { \
@@ -63,7 +63,7 @@ int read_title_id(const char* folder, char* title_id) {
 }
 
 
-int read_license(const char* root, SceNpDrmLicense* license, char* subfolder, char* final_path, size_t sz) {
+int read_license(char* root, SceNpDrmLicense* license, char* subfolder, char* final_path, size_t sz) {
 	char license_path[0x500] = { 0 };
 
 	FIL fl = { 0 };

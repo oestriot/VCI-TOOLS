@@ -1,3 +1,4 @@
+#include "log.h"
 #include "vci.h"
 #include "sha1.h"
 #include "sha256.h"
@@ -7,6 +8,8 @@ void get_cart_hash(const GcCmd56Keys* keys, uint8_t* packet20_hash) {
 	sha1_init(&sha1);
 	sha1_update(&sha1, (uint8_t*)keys->packet20_key, sizeof(keys->packet20_key));
 	sha1_final(&sha1, packet20_hash);
+
+	LOG_BUFFER("[GcAuthMgr] Cart Hash", packet20_hash, 0x14);
 }
 
 void get_cart_secret(const GcCmd56Keys* keys, uint8_t* cart_secret) {
@@ -14,4 +17,7 @@ void get_cart_secret(const GcCmd56Keys* keys, uint8_t* cart_secret) {
 	Sha256Initialise(&sha256);
 	Sha256Update(&sha256, keys, sizeof(GcCmd56Keys));
 	Sha256Finalise(&sha256, (SHA256_HASH*)cart_secret);
+
+	LOG_BUFFER("[GcAuthMgr] Cart Secret", cart_secret, 0x20);
+
 }

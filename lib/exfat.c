@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include "mbr.h"
 #include "vci.h"
 #include "psv.h"
@@ -9,7 +10,7 @@
 static uint8_t buffer[SECTOR_SIZE * 0x5000] = { 0 };
 #define RETERR() {res = 0; break;}
 
-int read_recursive(const char* prev, const char* extract_dir) {
+int read_recursive(char* prev, char* extract_dir) {
 	int res = 1;
 
 	char path[0x1028] = { 0 };
@@ -28,7 +29,7 @@ int read_recursive(const char* prev, const char* extract_dir) {
 			snprintf(out_path, sizeof(out_path) - 1, "%s/%s/%s", trim_path(extract_dir), trim_path(prev), trim_path(fileinfo.fname));
 
 			if ((fileinfo.fattrib & AM_DIR) != 0) {
-				printf("%s: %llu / %llu (%.0f%%)\n", out_path, 1llu, 1llu, 100.0f);
+				printf("%s: %u / %u (%.0f%%)\n", out_path, 1u, 1u, 100.0f);
 				create_directories(out_path, 1);
 
 				res = read_recursive(path, extract_dir);
@@ -47,7 +48,7 @@ int read_recursive(const char* prev, const char* extract_dir) {
 						do {
 							f_read(&fl, buffer, sizeof(buffer), &rd);
 							total += fwrite(buffer, 1, rd, out_fd);
-							printf("%s: %llu / %llu (%.0f%%)\r", out_path, total, fileinfo.fsize, (((double)total / (double)fileinfo.fsize) * 100.0));
+							printf("%s: %"PRIu64" / %"PRIu64" (%.0f%%)\r", out_path, total, fileinfo.fsize, (((double)total / (double)fileinfo.fsize) * 100.0));
 						} while (total < fileinfo.fsize);
 						printf("\n");
 

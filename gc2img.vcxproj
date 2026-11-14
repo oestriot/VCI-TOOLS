@@ -29,6 +29,7 @@
     <ClCompile Include="lib\ff\ffunicode.c" />
     <ClCompile Include="lib\gcauthmgr.c" />
     <ClCompile Include="lib\hmac_sha256.c" />
+    <ClCompile Include="lib\log.c" />
     <ClCompile Include="lib\mbr.c" />
     <ClCompile Include="lib\npdrm.c" />
     <ClCompile Include="lib\path.c" />
@@ -46,6 +47,7 @@
     <ClInclude Include="lib\ff\ffconf.h" />
     <ClInclude Include="lib\gcauthmgr.h" />
     <ClInclude Include="lib\hmac_sha256.h" />
+    <ClInclude Include="lib\log.h" />
     <ClInclude Include="lib\mbr.h" />
     <ClInclude Include="lib\npdrm.h" />
     <ClInclude Include="lib\path.h" />

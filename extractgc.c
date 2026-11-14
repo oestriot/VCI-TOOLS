@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "lib/compat.h"
 #include "lib/path.h"
@@ -29,7 +30,7 @@ int dump_partiton(FILE* img, ScePartition* part, uint64_t mbr_start_pos, const c
 		do {
 			size_t rd = fread(buffer, 1, (size_t)(((total + sizeof(buffer)) <= real_part_size) ? sizeof(buffer) : real_part_size - total), img);
 			total += fwrite(buffer, 1, rd, partition);
-			printf("%s: %llu / %llu (%.0f%%)\r", output_file, total, real_part_size, (((double)total / (double)real_part_size) * 100.0));
+			printf("%s: %"PRIu64" / %"PRIu64" (%.0f%%)\r", output_file, total, real_part_size, (((double)total / (double)real_part_size) * 100.0));
 		} while (total < real_part_size);
 
 		fclose(partition);

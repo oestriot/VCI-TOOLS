@@ -4,6 +4,7 @@
 #include "lib/npdrm.h"
 #include "lib/path.h"
 #include "lib/gcauthmgr.h"
+#include "lib/log.h"
 
 #define HANDLE_ARG(name, var) if (strcmp(argv[i], "-"name) == 0) { \
 									if( (i + 1) >= argc) { return show_usage(); } \
@@ -54,6 +55,7 @@ int show_usage() {
 
 
 int main(int argc, char** argv) {
+	enable_logging();
 
 	SceNpDrmLicense license = { 0 };
 	SceNpDrmActivationData activation = { 0 };
@@ -116,14 +118,14 @@ int main(int argc, char** argv) {
 		}
 
 		init_npdrm(
-			is_zeros((uint8_t*)&cart_secret, sizeof(cart_secret)) ?
+			is_zeros((uint8_t*)cart_secret, sizeof(cart_secret)) ?
 				NULL :
 				cart_secret,
 			is_zeros(idps, sizeof(idps)) ?
 				NULL :
 				idps,
-			is_zeros((uint8_t*)&activation, sizeof(activation))
-				? NULL :
+			is_zeros((uint8_t*)&activation, sizeof(activation)) ?
+				NULL :
 				&activation
 		);
 		if (decrypt_klicensee(klicensee, &license, 1)) {
