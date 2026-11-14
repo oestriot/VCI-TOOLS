@@ -36,4 +36,4 @@ vci2psv: $(OBJ) vci2psv.o
 	$(CC) -o $(OUTDIR)/$@ $^ $(CFLAGS)
 	
 npdrm2nonpdrm: $(OBJ) npdrm2nonpdrm.o
-	$(CC) -o $(OUTDIR)/$@ $^ $(CFLAGS)
+	$(CC) -o $(OUTDIR)/$@ $^ $(CFLAGS) -DLOGGING_ENABLED=1

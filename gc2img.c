@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
 			
 			// write the keys.bin file ..
 			change_extension("-keys.bin", gc_img_file, sizeof(gc_img_file), scratch);
-			write_file(scratch, &vci_header->keys, sizeof(GcCmd56Keys));
+			file_write(scratch, &vci_header->keys, sizeof(GcCmd56Keys));
 
 			dump_image(gc_img, img_file, vci_header->device_size);
 
@@ -78,10 +78,10 @@ int main(int argc, char** argv) {
 			// write out cart secret and cart hash ..
 
 			change_extension("-key.bin", gc_img_file, sizeof(gc_img_file), scratch);
-			write_file(scratch, psv_header->cart_secret, sizeof(psv_header->cart_secret));
+			file_write(scratch, psv_header->cart_secret, sizeof(psv_header->cart_secret));
 
 			change_extension("-cart_hash.bin", gc_img_file, sizeof(gc_img_file), scratch);
-			write_file(scratch, psv_header->cart_hash, sizeof(psv_header->cart_hash));
+			file_write(scratch, psv_header->cart_hash, sizeof(psv_header->cart_hash));
 
 			// seek to image start
 			fseek(gc_img, psv_header->image_offset * SECTOR_SIZE, SEEK_SET);

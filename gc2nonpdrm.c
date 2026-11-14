@@ -28,7 +28,7 @@ static uint8_t sector[SECTOR_SIZE] = { 0 };
 			if (decrypt_klicensee(klicensee, &license, 1)) { \
 				if (make_nonpdrm_license(&license, klicensee)) { \
 					snprintf(scratch, sizeof(scratch) - 1, "%s/%s/%s/sce_sys/package/work.bin", trim_path(out_folder), trim_path(copy_folder), trim_path(license_path)); \
-					write_file(scratch, &license, sizeof(SceNpDrmLicense)); \
+					file_write(scratch, &license, sizeof(SceNpDrmLicense)); \
 				} \
 				else { \
 					fprintf(stderr, "warn: failed to write nonpdrm license file.\n"); \

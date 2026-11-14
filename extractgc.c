@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
 			
 			// write keys
 			snprintf(scratch, sizeof(scratch) - 1, "%s/gc_cmd56_keys.bin", output_folder);
-			write_file(scratch, &vci->keys, sizeof(GcCmd56Keys));
+			file_write(scratch, &vci->keys, sizeof(GcCmd56Keys));
 
 			// seek to MBR
 			fseek(img, sizeof(VciHeader), SEEK_SET);
@@ -97,11 +97,11 @@ int main(int argc, char** argv) {
 			
 			// write cart secret
 			snprintf(scratch, sizeof(scratch) - 1, "%s/cart-secret.bin", output_folder);
-			write_file(scratch, psv->cart_secret, sizeof(psv->cart_secret));
+			file_write(scratch, psv->cart_secret, sizeof(psv->cart_secret));
 
 			// write keys
 			snprintf(scratch, sizeof(scratch) - 1, "%s/cart-hash.bin", output_folder);
-			write_file(scratch, psv->cart_hash, sizeof(psv->cart_hash));
+			file_write(scratch, psv->cart_hash, sizeof(psv->cart_hash));
 
 			// seek to MBR
 			fseek(img, psv->image_offset * SECTOR_SIZE, SEEK_SET);

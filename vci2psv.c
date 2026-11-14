@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
 			total += fwrite(&psv_header, 1, sizeof(PsvHeader), psv);
 
 			// write the keys file ..
-			write_file(key_file, &vci_header.keys, sizeof(GcCmd56Keys));
+			file_write(key_file, &vci_header.keys, sizeof(GcCmd56Keys));
 
 			// initalize sha256 ...
 			Sha256Context sha256;

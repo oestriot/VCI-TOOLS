@@ -3,6 +3,19 @@
 #include "lib/compat.h"
 #include "lib/npdrm.h"
 #include "lib/path.h"
+#include "lib/gcauthmgr.h"
+
+#define HANDLE_ARG(name, var) if (strcmp(argv[i], "-"name) == 0) { \
+									if( (i + 1) >= argc) { return show_usage(); } \
+									strncpy(var, argv[i + 1], sizeof(var) - 1); \
+								}
+
+static char OPT_NPDRM_FILE[0x500] = { 0 };
+static char OPT_NONPDRM_FILE[0x500] = { 0 };
+static char OPT_ACT_FILE[0x500] = { 0 };
+static char OPT_GC_KEYFILE[0x500] = { 0 };
+static char OPT_PLATFORM[0x500] = { 0 };
+static char OPT_CONSOLE_ID[0x500] = { 0 };
 
 void hex2bin(char* bytes, size_t len, const char* hexstr)
 {
@@ -22,14 +35,6 @@ void hex2bin(char* bytes, size_t len, const char* hexstr)
 }
 
 
-void log_buffer(char* header, uint8_t* buffer, size_t sz) {
-	printf("%s", header);
-	for (int i = 0; i < sz; i++) {
-		printf("%02X", buffer[i]);
-	}
-	printf("\n");
-}
-
 int is_zeros(uint8_t* buffer, size_t sz) {
 	for (int i = 0; i < buffer[i]; i++) {
 		if(buffer[i] != 0) return 0;
@@ -37,66 +42,95 @@ int is_zeros(uint8_t* buffer, size_t sz) {
 	return 1;
 }
 
+int show_usage() {
+	fprintf(stderr, "Usage: npdrm2nonpdrm <npdrm_rif>\n");
+	fprintf(stderr, "\t -act [act.dat file]\n");
+	fprintf(stderr, "\t -gc [cmd56 key file]\n");
+	fprintf(stderr, "\t -idps [console id]\n");
+	fprintf(stderr, "\t -platform [psp/vita]\n");
+	fprintf(stderr, "\t -o [nonpdrm_rif]\n");
+	return -1;
+}
+
+
 int main(int argc, char** argv) {
-	char npdrm_file[0x500] = { 0 };
-	char nonpdrm_file[0x500] = { 0 };
-	char act_file[0x500] = { 0 };
-	char console_id[0x10] = { 0 };
-	uint8_t vita = 1;
+
+	SceNpDrmLicense license = { 0 };
+	SceNpDrmActivationData activation = { 0 };
+	uint8_t idps[0x10] = { 0 };
+	uint8_t cart_secret[0x20] = { 0 };
+	uint8_t klicensee[0x10] = { 0 };
+	uint8_t is_vita = 1;
 
 	if (argc >= 2) {
-		strncpy(npdrm_file, argv[1], sizeof(npdrm_file) - 1);
+		strncpy(OPT_NPDRM_FILE, argv[1], sizeof(OPT_NPDRM_FILE) - 1);
 	}
 	else {
-		fprintf(stderr, "Usage: npdrm2nonpdrm <npdrm_rif> [nonpdrm_rif] [act.dat] [console_id] [psp]\n");
-		return -1;
+		return show_usage();
 	}
 
 
-	if (argc >= 3) {
-		strncpy(nonpdrm_file, argv[2], sizeof(nonpdrm_file) - 1);
-	}
-	else {
-		change_extension("-nonpdrm.rif", npdrm_file, sizeof(nonpdrm_file), nonpdrm_file);
-	}
-
-	if (argc >= 4) {
-		strncpy(act_file, argv[3], sizeof(act_file) - 1);
+	for (size_t i = 2; i < argc; i++) {
+		HANDLE_ARG("act", OPT_ACT_FILE);
+		HANDLE_ARG("gc", OPT_GC_KEYFILE);
+		HANDLE_ARG("platform", OPT_PLATFORM);
+		HANDLE_ARG("idps", OPT_CONSOLE_ID);
+		HANDLE_ARG("o", OPT_NONPDRM_FILE);
 	}
 
-	if (argc >= 5) {
-		hex2bin(console_id, sizeof(console_id), argv[4]);
-	}
 
-	if (argc >= 6) {
-		if (strcmp(argv[5], "yes") == 0) {
-			vita = 0;
-		}
-	}
+	if (!is_zeros(OPT_NPDRM_FILE, sizeof(OPT_NPDRM_FILE))) {
 
-	if (file_exists(npdrm_file)) {
-		SceNpDrmLicense license = { 0 };
-		SceNpDrmActivationData activation = { 0 };
-		uint8_t klicensee[0x10] = { 0 };
-
-		FILE* npdrm = fopen(npdrm_file, "rb");
-		fread(&license, 1, sizeof(license), npdrm);
-		fclose(npdrm);
-
-		if (!is_zeros(act_file, sizeof(act_file))) {
-			FILE* actdat = fopen(act_file, "rb");
-			fread(&activation, 1, sizeof(activation), actdat);
-			fclose(actdat);
+		if (!file_read(OPT_NPDRM_FILE, &license, sizeof(SceNpDrmLicense))) {
+			fprintf(stderr, "err: cannot read %s", OPT_NPDRM_FILE);
+			return -1;
 		}
 
+		// read act.dat
+		if (!is_zeros(OPT_ACT_FILE, sizeof(OPT_ACT_FILE))) {
+			file_read(OPT_ACT_FILE, &activation, sizeof(SceNpDrmActivationData));
+		}
 
-		init_npdrm(NULL, !is_zeros(console_id, sizeof(console_id)) ? NULL : console_id, !is_zeros((uint8_t*)&activation, sizeof(activation)) ? NULL : &activation);
+		// read gc keyfile
+		if (!is_zeros(OPT_GC_KEYFILE, sizeof(OPT_GC_KEYFILE))) {
+			GcCmd56Keys keys;
+			if (file_read(OPT_GC_KEYFILE, &keys, sizeof(GcCmd56Keys))) {
+				get_cart_secret(&keys, cart_secret);
+			}
+		}
+
+		// read consoleid
+		if (!is_zeros(OPT_CONSOLE_ID, sizeof(OPT_CONSOLE_ID))) {
+			if (!file_read(OPT_CONSOLE_ID, idps, sizeof(idps))) {
+				hex2bin(idps, sizeof(idps), OPT_CONSOLE_ID);
+			}
+		}
+
+		if (strncmp(OPT_PLATFORM, "psp", sizeof(OPT_PLATFORM) - 1)) {
+			is_vita = 0;
+		}
+
+		// default arguments
+		if (is_zeros(OPT_NONPDRM_FILE, sizeof(OPT_NONPDRM_FILE))) {
+			change_extension("-nonpdrm.rif", OPT_NPDRM_FILE, sizeof(OPT_NONPDRM_FILE), OPT_NONPDRM_FILE);
+		}
+
+		init_npdrm(
+			is_zeros((uint8_t*)&cart_secret, sizeof(cart_secret)) ?
+				NULL :
+				cart_secret,
+			is_zeros(idps, sizeof(idps)) ?
+				NULL :
+				idps,
+			is_zeros((uint8_t*)&activation, sizeof(activation))
+				? NULL :
+				&activation
+		);
 		if (decrypt_klicensee(klicensee, &license, 1)) {
-			log_buffer("got klicensee: ", klicensee, KLICENSEE_SIZE);
 			if (make_nonpdrm_license(&license, klicensee)) {
-				printf("writing %s\n", nonpdrm_file);
+				printf("Writing %s\n", OPT_NONPDRM_FILE);
 
-				FILE* nonpdrm = fopen(nonpdrm_file, "wb");
+				FILE* nonpdrm = fopen(OPT_NONPDRM_FILE, "wb");
 				fwrite(&license, 1, sizeof(SceNpDrmLicense), nonpdrm);
 				fclose(nonpdrm);
 			}
@@ -106,13 +140,13 @@ int main(int argc, char** argv) {
 			}
 		}
 		else {
-			fprintf(stderr, "err: failed to decrypt klicensee (no activation record?)\n");
+			fprintf(stderr, "err: failed to decrypt klicensee (check paramaters)\n");
 			return -1;
 		}
 
 	}
 	else {
-		fprintf(stderr, "err: no such file: %s\n", npdrm_file);
+		fprintf(stderr, "err: no such file: %s\n", OPT_NPDRM_FILE);
 		return -1;
 	}
 

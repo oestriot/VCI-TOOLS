@@ -29,19 +29,27 @@ void create_directories(const char* dir_name, uint8_t including_last) {
 	}
 }
 
-void write_file(const char* filename, const void* data, size_t size) {
+void file_write(const char* filename, const void* data, size_t size) {
 	create_directories(filename, 0);
 
 	FILE* fd = fopen(filename, "wb");
-	size_t wr = fwrite(data, 1, size, fd);
-	printf("%s: %zu / %zu (%.0f%%)\n", filename, wr, size, 100.0);
-	fclose(fd);
+	if (fd != NULL) {
+		size_t wr = fwrite(data, 1, size, fd);
+		printf("%s: %zu / %zu (%.0f%%)\n", filename, wr, size, 100.0);
+		fclose(fd);
+	}
 }
 
-void read_file(const char* filename, void* data, size_t size) {
-	FILE* fd = fopen(filename, "rb");
-	fread(data, 1, size, fd);
-	fclose(fd);
+int file_read(const char* filename, void* data, size_t size) {
+	if (file_exists(filename)) {
+		FILE* fd = fopen(filename, "rb");
+		if (fd != NULL) {
+			fread(data, 1, size, fd);
+			fclose(fd);
+			return 1;
+		}
+	}
+	return 0;
 }
 
 int file_exists(const char* path) {

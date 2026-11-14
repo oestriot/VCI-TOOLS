@@ -48,6 +48,8 @@ int wmain(int argc, wchar_t** argv) {
 	}
 	return utf8_main(argc, utf8_argv);
 }
+
+
 #endif
 
 #endif

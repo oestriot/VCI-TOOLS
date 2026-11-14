@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
 			create_vci_header(psv_header->image_size, &vci_header);
 
 			// read in keys from the keys file
-			read_file(key_file, &vci_header.keys, sizeof(VciHeader));
+			file_read(key_file, &vci_header.keys, sizeof(VciHeader));
 
 			// validate the keys we just read ... 
 			if (verify_keys(psv_header->cart_secret, &vci_header.keys)) {
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
 			create_vci_header(img_size, &vci_header);
 
 			// read in keys from the keys file
-			read_file(key_file, &vci_header.keys, sizeof(VciHeader));
+			file_read(key_file, &vci_header.keys, sizeof(VciHeader));
 			
 			// seek to image start ..
 			fseek(img, 0, SEEK_SET);

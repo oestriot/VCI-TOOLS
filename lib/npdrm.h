@@ -55,7 +55,7 @@ typedef PACK(struct SceNpDrmLicense { // size is 0x200
 static_assert(sizeof(SceNpDrmLicense) == 0x200, "Invalid size for SceNpDrmLicense");
 
 void init_npdrm(uint8_t* cart_secret, uint8_t* console_id, SceNpDrmActivationData* activation_data);
-int decrypt_klicensee(uint8_t* klicensee, SceNpDrmLicense* license, int vita);
+int decrypt_klicensee(uint8_t* klicensee, SceNpDrmLicense* license, uint8_t vita);
 int make_nonpdrm_license(SceNpDrmLicense* license, uint8_t* klicensee);
 
 #endif
