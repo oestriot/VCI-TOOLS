@@ -194,7 +194,7 @@ int decrypt_klicensee(uint8_t* klicensee, SceNpDrmLicense* license, uint8_t vita
 	// copy key2 to klicensee buffer ...
 	memcpy(klicensee, license->key2, sizeof(license->key2));
 
-	// copy license to license buffer ..
+	// copy license to binddata license buffer ..
 	memcpy(bind_data.license, license, sizeof(bind_data.license));
 
 	// if not vita, do it the psp way;
@@ -224,19 +224,22 @@ int decrypt_klicensee(uint8_t* klicensee, SceNpDrmLicense* license, uint8_t vita
 		}
 	}
 	else { // handle physical games ..
-		if (vita == 0) { // use key1 directly if physical.
+		if (!vita) { // if calling the PSP function on a Phyiscal game license; then we directly use key1.
 			memcpy(klicensee, license->key1, KLICENSEE_SIZE);
 		}
-		else {
+		else { // otherwise, the bind key is the cart secret.
 			if (!G_CART_INSERTED) return 0;
 			memcpy(bind_data.key, G_CART_SECRET, sizeof(bind_data.key));
 		}
 	}
 	
-
+    
 	LOG_BUFFER("[RIF] Bind Key", bind_data.key, sizeof(bind_data.key));
+
+    // decrypt key2 to klicensee using the bind data specified,
 	decrypt_bind_data(klicensee, KLICENSEE_SIZE, (char*)&bind_data, sizeof(SceNpBindData));
 
+    // if the debug flag is set, then the klicensee is all 0x00.
 	if (is_debug) {
 		memset(klicensee, 0x00, KLICENSEE_SIZE);
 	}
