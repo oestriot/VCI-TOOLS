@@ -28,7 +28,7 @@ const uint8_t PSM_RIF_KEY_5[0x100] = { 0x67, 0x19, 0xe4, 0x73, 0x01, 0x1b, 0xf7,
 // npdrm commune variables;
 static SceNpDrmActivationData G_ACTIVATION_DATA = { 0 };
 static uint8_t G_CART_SECRET[0x20] = { 0 };
-static uint8_t OPT_CONSOLE_ID[0x10] = { 0 };
+static uint8_t G_CONSOLE_ID[0x10] = { 0 };
 static uint8_t G_ACTIVATED = 0;
 static uint8_t G_CART_INSERTED = 0;
 
@@ -46,7 +46,7 @@ void decrypt_key_table() {
 
 	// generate per console act key.
 	uint8_t act_key_perconsole[0x10] = { 0 };
-	aes_ecb_out_enc(act_key_perconsole, ACT_KEY, OPT_CONSOLE_ID);
+	aes_ecb_out_enc(act_key_perconsole, ACT_KEY, G_CONSOLE_ID);
 	LOG_BUFFER("[ACT] Per-Console Activation Key", act_key_perconsole, sizeof(act_key_perconsole));
 
 	// decrypt all activation keys
@@ -76,7 +76,7 @@ void set_cart_secret(uint8_t* cart_secret) {
 }
 
 void set_console_id(uint8_t* console_id) {
-	memcpy(OPT_CONSOLE_ID, console_id, sizeof(OPT_CONSOLE_ID));
+	memcpy(G_CONSOLE_ID, console_id, sizeof(G_CONSOLE_ID));
 }
 
 void set_activation_data(SceNpDrmActivationData* activation_data) {
@@ -105,7 +105,7 @@ void decrypt_bind_data(char* key, size_t keyLen, char* bindData, size_t bindData
 	uint8_t aes_iv[0x10] = { 0 };
 
     // derive aes key from bind data, and BIND_HMAC
-	hmac_sha256(BIND_HMAC_KEY, sizeof(BIND_KEY), bindData, bindDataLen, bind_hmac, sizeof(bind_hmac));
+	hmac_sha256(BIND_HMAC_KEY, sizeof(BIND_HMAC_KEY), bindData, bindDataLen, bind_hmac, sizeof(bind_hmac));
 
     // first 0x10 bytes of resulting hmac_sha256 of binddata; is aes key,
     // the last 0x10 bytes, are the iv
