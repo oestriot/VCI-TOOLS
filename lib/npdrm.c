@@ -125,7 +125,7 @@ int decrypt_klicensee(uint8_t* klicensee, SceNpDrmLicense* license, uint8_t vita
 
 	uint8_t is_digital = ((license->license_flags & 0x4) == 0);
 	uint8_t is_psp = !vita && is_digital;
-	uint8_t is_drmbind = (license->license_flags >> 8) != 0b000011010;
+	uint8_t is_drmbind = (license->license_flags >> 8) != 0b00001101;
 	uint8_t is_debug = (license->license_flags >> 8) == 0;
 
 	/*
@@ -161,7 +161,7 @@ int decrypt_klicensee(uint8_t* klicensee, SceNpDrmLicense* license, uint8_t vita
 	LOG_LINE("[RIF] License Flags: 0x%x", license->license_flags);
 
 	LOG_LINE("[RIF] Content Id: %s", license->content_id);
-	LOG_LINE("[RIF] Account Id: 0x%"PRId64"x", license->account_id);
+	LOG_LINE("[RIF] Account Id: 0x%"PRIx64"", license->account_id);
 	LOG_LINE("[RIF] Start Time: 0x%"PRId64"", license->start_time);
 	LOG_LINE("[RIF] Expiration Time: 0x%"PRId64"", license->expiration_time);
 	LOG_BOOL("[RIF] Upgradable App", license->debug_upgradable);
